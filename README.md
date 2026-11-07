@@ -33,6 +33,10 @@ python -m demo.agent_demo --compare  # one question, stock vs oneDAL, side by si
 python -m bench.run_bench            # ~10-15 min: full benchmark -> results/<your-cpu>/summary.md
 ```
 
+CI (`.github/workflows/ci.yml`) runs ruff and pytest on Ubuntu (Python 3.11 and 3.13) and Windows
+(Python 3.12). The Ubuntu jobs also run `python -m bench.parity --size S` with output in the runner's
+temp directory, so a CI run does not write `results/`.
+
 oneDAL runs on x86-64 CPUs (Intel and AMD). Run `bench.parity` again after any change to the
 scikit-learn or scikit-learn-intelex version: until you do, the envelope marks every oneDAL
 result `citable: false`.

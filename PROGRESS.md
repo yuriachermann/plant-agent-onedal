@@ -20,3 +20,11 @@ Plan: add `pyproject.toml` with project metadata, ruff, and the pytest config no
 Files: `pyproject.toml`, `requirements-lock.txt`, `CHANGELOG.md`, `PROGRESS.md`, `pytest.ini` (remove), `README.md`, and any file ruff still flags.
 
 Outcome: `ruff check .` clean. `pytest -q` 11 passed in 24.39s. `python -m bench.parity` PASS (metrics unchanged from the baseline record; the rewritten `results/parity.json` was restored so a new timestamp is not committed). Ruff selection is E/F/I/UP/B. Fixes were an f-string with no placeholder, `datetime.UTC`, and import order in `bench/kernels.py`. `tools/signals.py` import order ended up identical to HEAD.
+
+## 0.2 CI
+
+Plan: add `.github/workflows/ci.yml`. Ubuntu matrix Python 3.11 and 3.13 installs the requirements, runs ruff, pytest, then `python -m bench.parity --size S --out "$RUNNER_TEMP"`. Windows job on Python 3.12 runs pytest only. Confirm the same commands pass locally, with parity pointed at a temp directory.
+
+Files: `.github/workflows/ci.yml`, `README.md`, `CHANGELOG.md`, `PROGRESS.md`.
+
+Outcome: workflow file written. Locally `ruff check .` was already clean and `pytest -q` was already green in 0.1. `python -m bench.parity --size S --out` a temp directory PASS (exit 0); it did not write `results/`. GitHub itself was not executed from this machine.
