@@ -43,4 +43,12 @@ Plan: derive machine-hours from stops, cycles and machines, leaving context colu
 
 Files: `plantgen/derive.py`, `plantgen/io.py`, `plantgen/__init__.py`, `tools/drivers.py`, `tools/common.py`, `tools/schemas.json`, `tests/test_derive.py`, `docs/real-data.md`, `results/parity.json` (tool version 0.2.0), `README.md`, `CHANGELOG.md`, `PROGRESS.md`.
 
-Outcome: derived `unplanned_rate` matches the generator to the stored 0.01 precision (re-splitting rounded durations). Shifts match. `program_new` is first-seen, which is not the generator's hidden intro day. `pytest` after the parity rewrite: tools and derive tests passed (13 in the focused run). `python -m bench.parity` PASS, same metrics as the baseline (plant Spearman 0.9301, ΔR² 0.0017, ARI 1.0). Tool version is now 0.2.0.
+Outcome: derived `unplanned_rate` matches the generator to the stored 0.01 precision (re-splitting rounded durations). Shifts match. `program_new` is first-seen, which is not the generator's hidden intro day. `pytest -q`: 25 passed, 1 deselected, in 37.80s. `python -m bench.parity` PASS, same metrics as the baseline (plant Spearman 0.9301, ΔR² 0.0017, ARI 1.0). Tool version is now 0.2.0.
+
+## 0.5 Benchmark robustness
+
+Plan: add `--seeds` (default remains the single `--seed`, 7), report p50 and p90 beside the existing median, and run kernel sweeps at 1, 2, and all threads in a subprocess that sets OMP/TBB/MKL/OpenBLAS before NumPy imports. Keep the old JSON keys. Re-rendering `results/intel-xeon-2t` bench JSON must still produce the same answer milliseconds.
+
+Files: `bench/run_bench.py`, `bench/report.py`, `bench/kernels.py`, `tests/test_bench.py`, `CHANGELOG.md`, `PROGRESS.md`.
+
+Outcome: `tests/test_bench.py` passed, including the Xeon bench JSON (plant M answer milliseconds unchanged) and a synthetic p50–p90 column. Thread caps are checked by `python -m bench.kernels --threads 1 --dump-threads`. The timed scratch run is recorded below once `results/_scratch` exists.

@@ -12,14 +12,60 @@ several input sizes. One backend per process (see run_bench.py).
 """
 from __future__ import annotations
 
-import argparse
-import json
+import os
+import subprocess
 import sys
-import time
-import warnings
-from pathlib import Path
 
-import numpy as np
+# Set before NumPy or oneDAL are imported. ``--threads`` re-execs this module
+# in a child whose BLAS / TBB pools are already capped.
+THREAD_VARS = (
+    "OMP_NUM_THREADS",
+    "MKL_NUM_THREADS",
+    "OPENBLAS_NUM_THREADS",
+    "NUMEXPR_NUM_THREADS",
+    "VECLIB_MAXIMUM_THREADS",
+    "TBB_NUM_THREADS",
+    "DAAL_NUM_THREADS",
+)
+
+
+def thread_limit_env(n: str) -> dict:
+    """Environment for a process whose numeric libraries use ``n`` threads.
+
+    ``n`` is a positive integer, or ``"all"`` for the machine's logical CPU count.
+    """
+    value = str(os.cpu_count() or 1) if n == "all" else str(int(n))
+    env = os.environ.copy()
+    env["PLANT_KERNELS_THREADS_READY"] = "1"
+    env["PLANT_KERNELS_THREADS"] = value
+    env["PLANT_KERNELS_THREADS_REQUESTED"] = n
+    for key in THREAD_VARS:
+        env[key] = value
+    return env
+
+
+def _reexec_for_threads() -> None:
+    """Run the sweep in a child with the thread cap set, then exit this process."""
+    if os.environ.get("PLANT_KERNELS_THREADS_READY") == "1":
+        return
+    argv = sys.argv[1:]
+    if "--threads" not in argv:
+        return
+    n = argv[argv.index("--threads") + 1]
+    proc = subprocess.run([sys.executable, "-m", "bench.kernels", *argv], env=thread_limit_env(n))
+    os._exit(proc.returncode)
+
+
+if __name__ == "__main__":
+    _reexec_for_threads()
+
+import argparse  # noqa: E402
+import json  # noqa: E402
+import time  # noqa: E402
+import warnings  # noqa: E402
+from pathlib import Path  # noqa: E402
+
+import numpy as np  # noqa: E402
 
 warnings.filterwarnings("ignore")
 REPO = Path(__file__).resolve().parents[1]
@@ -38,10 +84,17 @@ def best_of(f, reps: int) -> float:
 
 def main(argv=None):
     ap = argparse.ArgumentParser()
-    ap.add_argument("--backend", choices=["stock", "onedal"], required=True)
-    ap.add_argument("--out", required=True)
+    ap.add_argument("--backend", choices=["stock", "onedal"])
+    ap.add_argument("--out")
     ap.add_argument("--seed", type=int, default=7)
+    ap.add_argument("--threads", help="1, 2, all, or a count. Applied in a subprocess before numeric imports.")
+    ap.add_argument("--dump-threads", action="store_true", help="print the thread environment and exit")
     args = ap.parse_args(argv)
+    if args.dump_threads:
+        print(json.dumps({k: os.environ.get(k) for k in THREAD_VARS}, sort_keys=True))
+        return 0
+    if not args.backend or not args.out:
+        ap.error("--backend and --out are required")
 
     from sklearn.cluster import kmeans_plusplus
 
@@ -52,7 +105,10 @@ def main(argv=None):
     plant = generate_plant("L", seed=args.seed)
     rng = np.random.default_rng(0)
     Xs_all = stop_features(plant.stops)
-    res = {"backend": args.backend, "plant": plant.summary(), "kernels": {}}
+    requested = os.environ.get("PLANT_KERNELS_THREADS_REQUESTED")
+    threads = os.environ.get("PLANT_KERNELS_THREADS")
+    res = {"backend": args.backend, "plant": plant.summary(), "kernels": {},
+           "threads": int(threads) if threads else None, "threads_requested": requested}
     K = res["kernels"]
 
     K["dbscan"] = []
@@ -113,8 +169,13 @@ def main(argv=None):
         K["pca"].append({"n": n, "ms": best_of(pca, 3)})
 
     Path(args.out).mkdir(parents=True, exist_ok=True)
-    (Path(args.out) / f"kernels_{args.backend}.json").write_text(json.dumps(res, indent=2))
-    print(f"[{args.backend}] kernels done", flush=True)
+    suffix = ""
+    if requested == "all":
+        suffix = "_tall"
+    elif requested:
+        suffix = f"_t{requested}"
+    (Path(args.out) / f"kernels_{args.backend}{suffix}.json").write_text(json.dumps(res, indent=2))
+    print(f"[{args.backend}] kernels done" + (f" threads={requested}" if requested else ""), flush=True)
 
 
 if __name__ == "__main__":
