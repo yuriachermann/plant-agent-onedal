@@ -28,3 +28,11 @@ Plan: add `.github/workflows/ci.yml`. Ubuntu matrix Python 3.11 and 3.13 install
 Files: `.github/workflows/ci.yml`, `README.md`, `CHANGELOG.md`, `PROGRESS.md`.
 
 Outcome: workflow file written. Locally `ruff check .` was already clean and `pytest -q` was already green in 0.1. `python -m bench.parity --size S --out` a temp directory PASS (exit 0); it did not write `results/`. GitHub itself was not executed from this machine.
+
+## 0.3 Multi-seed evaluation
+
+Plan: score drift, signal health, loss drivers and stop suggestions against `plant.truth` for seeds 1–10 and sizes S and M. Write `results/eval/summary.md` and `.json`. Add a slow test whose floors are the measured means minus 0.10.
+
+Files: `bench/evaluate.py`, `tests/test_evaluate.py`, `results/eval/`, `README.md`, `CHANGELOG.md`, `PROGRESS.md`.
+
+Outcome: `results/eval/summary.json`, stock scikit-learn, 20 plants. Drift precision 100% on the 19 plants that flagged anyone; recall mean 0.5333 (0.45 on S, 0.6167 on M). Coolant recall mean 0.9, healthy-machine false positives 0. Planted drivers in the top 3: mean 0.7125 (shift only 0.10). Any null driver reported: 0.25 of runs. Stop coverage mean 0.8724 by count, accuracy 0.965 by count and 0.6145 by minutes. Plant M seed 7: coverage 0.8537 (85.4%), accuracy 0.9799 (98.0%), accuracy by minutes 0.6723 (67.2%). `pytest -m slow` passed in 289.12s.

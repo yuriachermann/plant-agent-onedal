@@ -110,8 +110,30 @@ program-edit steps (+10% cycle time, lower cutting load), coolant-pump degradati
 change), a bad material supplier, a night shift with longer material waits, and maintenance-age
 effects on breakdowns. Operator ID and coolant concentration are null drivers.
 
-**Your own data:** export the four tables with the columns in `plantgen/io.py:SCHEMA` and load them
-with `plantgen.load_plant(dir)`. `reason_true` is optional.
+**Your own data:** export the tables in `plantgen/io.py`. Context columns you do not have stay out of the
+file; `load_plant` builds the hour table from stops, cycles and machines when `hours.csv` is missing.
+`docs/real-data.md` is the column mapping and a TimescaleDB export, with the assumptions marked.
+`reason_true` is optional.
+
+## Detection quality
+
+`python -m bench.evaluate` scores the tools against `plant.truth` on seeds 1–10 and sizes S and M.
+The numbers below are from `results/eval/summary.json` (stock scikit-learn, 20 plants).
+
+* **Drift** (wear and step together). On the 19 plants that flagged a machine, precision is 100%.
+  Mean recall is 53.3% (45.0% on S, 61.7% on M). One size-S plant flagged nobody.
+* **Signal health.** Coolant recall averages 90% (100% on M, and 0 on two size-S plants). No healthy
+  machine was flagged. Healthy means no wear, step, or coolant fault.
+* **Drivers.** On average 71.2% of the planted drivers land in the top 3: tool age in every run,
+  supplier in 90%, days since maintenance in 85%, shift in 10%. A null driver is reported in 25% of
+  runs (operator 20%, weekday 15%, coolant concentration in none).
+* **Stop suggestions.** Coverage averages 87.2% of unjustified stops (66.4% of their minutes).
+  Accuracy is 96.5% by count and 61.5% weighted by minutes. Plant M, seed 7, which the slides quote:
+  coverage 85.4%, accuracy 98.0%, accuracy weighted by minutes 67.2%
+  (`runs` where `size` is M and `seed` is 7).
+
+`pytest -m slow` reruns the same grid and checks floors 0.10 below those means. The healthy-machine
+false-positive ceiling is the measured maximum, 0, plus 0.05.
 
 ## Reference results
 

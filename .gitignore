@@ -5,3 +5,5 @@ venv/
 data/
 .pytest_cache/
 results/demo_trace_*.json
+results/_scratch/
+results/_eval_smoke/
