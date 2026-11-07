@@ -90,7 +90,7 @@ def main(argv=None):
     plant = generate_plant(args.size, seed=args.seed)
     scopes = {"plant": None, "line": {"line_id": "L2", "day_from": plant.days - 7}}
     v = versions("onedal")
-    record = {"checked_at": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"),
+    record = {"checked_at": dt.datetime.now(dt.UTC).isoformat(timespec="seconds"),
               "plant": plant.summary(), "versions": v, "tool_version": TOOL_VERSION, "tolerances": TOL, "tools": {}}
     all_ok = True
     for name in TOOLS:
@@ -122,7 +122,7 @@ def main(argv=None):
 
 
 def _report(rec) -> str:
-    lines = [f"# Parity gate: oneDAL vs stock scikit-learn", "",
+    lines = ["# Parity gate: oneDAL vs stock scikit-learn", "",
              f"Checked {rec['checked_at']} · sklearn {rec['versions']['sklearn']} · sklearnex {rec['versions']['sklearnex']}"
              f" · tool version {rec['tool_version']} · plant {rec['plant']['machines']} machines, {rec['plant']['days']} days", "",
              "| Tool | Scope | Result | Key metrics | oneDAL dispatch |", "|---|---|---|---|---|"]

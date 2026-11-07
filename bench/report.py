@@ -41,7 +41,7 @@ def main(argv=None):
     q = args.questions_per_day
     summary = {"machine": s["machine"], "versions": {"stock": s["versions"], "onedal": o["versions"]},
                "assumptions": {"questions_per_day": q, "usd_per_core_hour": args.usd_per_core_hour}, "sizes": {}}
-    md = [f"# Benchmark: stock scikit-learn vs oneDAL", "",
+    md = ["# Benchmark: stock scikit-learn vs oneDAL", "",
           f"**Machine:** {s['machine']['cpu']} · {s['machine']['logical_cpus']} logical CPUs · ISA {', '.join(s['machine']['isa']) or 'n/a'}"
           f" · {s['machine']['os']} · Python {s['machine']['python']}",
           f"**Versions:** scikit-learn {s['versions']['sklearn']} · scikit-learn-intelex {o['versions'].get('sklearnex')}"

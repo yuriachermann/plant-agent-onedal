@@ -1,0 +1,48 @@
+[project]
+name = "plant-agent-onedal"
+version = "0.1.0"
+description = "oneDAL-accelerated analytics behind a manufacturing agent's tool interface"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "numpy>=2.0",
+    "pandas>=2.2",
+    "scikit-learn>=1.6",
+    "scikit-learn-intelex>=2025.0",
+    "matplotlib>=3.8",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "ruff>=0.8", "threadpoolctl>=3"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["plantgen*", "tools*", "bench*", "demo*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+filterwarnings = ["ignore"]
+addopts = ["-m", "not slow"]
+markers = [
+    "slow: multi-seed detection evaluation; off by default, run with pytest -m slow",
+]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 120
+src = ["plantgen", "tools", "bench", "demo", "tests"]
+
+[tool.ruff.lint]
+# Explicit set so `ruff check` does not follow ruff's growing default list.
+# The ignores below are the house style, not a way to hide a failing check:
+# long sentences in fact text, lambdas that best_of() calls before the next
+# loop iteration, and zips of equal-length arrays built together.
+select = ["E", "F", "I", "UP", "B"]
+ignore = ["E501", "E731", "E741", "B007", "B023", "B905"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["plantgen", "tools", "bench", "demo"]

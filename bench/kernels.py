@@ -84,8 +84,9 @@ def main(argv=None):
         K["knn"].append({"n_ref": n_ref, "ms": best_of(knn, 3)})
 
     H = plant.hours[plant.hours["unplanned_rate"].notna()]
-    from tools.drivers import CATS, NUMS
     import pandas as pd
+
+    from tools.drivers import CATS, NUMS
     Xh = np.column_stack([*[pd.Categorical(H[c]).codes for c in CATS], *[H[c].to_numpy(float) for c in NUMS]]).astype(np.float64)
     yh = H["unplanned_rate"].to_numpy()
     K["rf_fit"] = []

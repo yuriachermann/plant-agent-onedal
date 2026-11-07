@@ -26,6 +26,7 @@ python -m venv .venv
 source .venv/bin/activate            # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 
+ruff check .                         # config lives in pyproject.toml
 pytest -q                            # ~15 s: parity, determinism, planted faults, citation check
 python -m bench.parity               # ~30 s: writes results/parity.json (the agent reads it)
 python -m demo.agent_demo --compare  # one question, stock vs oneDAL, side by side
