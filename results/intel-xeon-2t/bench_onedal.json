@@ -1,0 +1,543 @@
+{
+  "backend": "onedal",
+  "versions": {
+    "backend": "onedal",
+    "sklearn": "1.9.1",
+    "sklearnex": "2026.2.0",
+    "onedal": "2026.2.0"
+  },
+  "machine": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "logical_cpus": 2,
+    "isa": [
+      "avx2",
+      "avx512f",
+      "avx512_vnni",
+      "amx_tile"
+    ],
+    "mem_gb": 7.8,
+    "os": "Linux 6.18.44-fc-v300",
+    "python": "3.13.18"
+  },
+  "seed": 7,
+  "repeats": 5,
+  "import_ms": 789.9,
+  "sizes": {
+    "S": {
+      "plant": {
+        "plant_id": "plant-12m-s7",
+        "machines": 12,
+        "days": 30,
+        "stops": 13573,
+        "cycles": 120508,
+        "machine_hours": 5288,
+        "stops_per_day": 522.0,
+        "cycles_per_day": 4634.9
+      },
+      "nightly": {
+        "cold": {
+          "wall_ms": 1475.3,
+          "cpu_ms": 2413.6,
+          "tools": {
+            "cluster_stops": {
+              "wall_ms": 154.5,
+              "cpu_ms": 259.7,
+              "phases_ms": {
+                "prep": 4.91,
+                "init": 6.47,
+                "ml_kmeans": 19.12,
+                "ml_dbscan": 94.84,
+                "post": 27.46,
+                "total": 152.81
+              },
+              "dbscan_path": "onedal-brute"
+            },
+            "detect_cycle_drift": {
+              "wall_ms": 477.1,
+              "cpu_ms": 716.8,
+              "phases_ms": {
+                "prep": 90.67,
+                "ml_knn": 262.97,
+                "post": 115.13,
+                "total": 468.77
+              }
+            },
+            "rank_loss_drivers": {
+              "wall_ms": 635.8,
+              "cpu_ms": 1231.2,
+              "phases_ms": {
+                "prep": 9.74,
+                "ml_rf_fit": 90.77,
+                "ml_rf_permutation": 524.79,
+                "post": 7.55,
+                "total": 632.86
+              }
+            },
+            "signal_health": {
+              "wall_ms": 208.0,
+              "cpu_ms": 206.0,
+              "phases_ms": {
+                "prep": 86.41,
+                "ml_pca": 56.72,
+                "post": 59.23,
+                "total": 202.36
+              }
+            }
+          }
+        },
+        "warm": {
+          "wall_ms": 1512.6,
+          "cpu_ms": 2470.6,
+          "tools": {
+            "cluster_stops": {
+              "wall_ms": 135.9,
+              "cpu_ms": 231.5,
+              "phases_ms": {
+                "prep": 5.55,
+                "init": 4.86,
+                "ml_kmeans": 11.3,
+                "ml_dbscan": 91.48,
+                "post": 21.32,
+                "total": 134.52
+              },
+              "dbscan_path": "onedal-brute"
+            },
+            "detect_cycle_drift": {
+              "wall_ms": 506.5,
+              "cpu_ms": 759.2,
+              "phases_ms": {
+                "prep": 131.66,
+                "ml_knn": 277.06,
+                "post": 91.67,
+                "total": 500.39
+              }
+            },
+            "rank_loss_drivers": {
+              "wall_ms": 675.7,
+              "cpu_ms": 1285.7,
+              "phases_ms": {
+                "prep": 6.21,
+                "ml_rf_fit": 89.07,
+                "ml_rf_permutation": 568.4,
+                "post": 8.37,
+                "total": 672.05
+              }
+            },
+            "signal_health": {
+              "wall_ms": 194.4,
+              "cpu_ms": 194.2,
+              "phases_ms": {
+                "prep": 83.57,
+                "ml_pca": 50.82,
+                "post": 54.73,
+                "total": 189.12
+              }
+            }
+          }
+        },
+        "all_wall_ms": [
+          1475.3,
+          1512.6,
+          1505.2
+        ]
+      },
+      "on_demand": {
+        "cluster_stops": {
+          "scope": {
+            "line_id": "L2",
+            "day_from": 23
+          },
+          "median_ms": 26.85,
+          "min_ms": 25.57,
+          "max_ms": 27.95,
+          "ml_median_ms": 3.67,
+          "cpu_median_ms": 30.45,
+          "rows": 1407,
+          "dbscan_path": "onedal-brute"
+        },
+        "detect_cycle_drift": {
+          "scope": {
+            "line_id": "L2"
+          },
+          "median_ms": 186.35,
+          "min_ms": 178.04,
+          "max_ms": 206.25,
+          "ml_median_ms": 113.32,
+          "cpu_median_ms": 286.51,
+          "rows": 14,
+          "dbscan_path": null
+        },
+        "rank_loss_drivers": {
+          "scope": {
+            "line_id": "L2"
+          },
+          "median_ms": 304.27,
+          "min_ms": 283.67,
+          "max_ms": 329.31,
+          "ml_median_ms": 294.49,
+          "cpu_median_ms": 577.76,
+          "rows": 2093,
+          "dbscan_path": null
+        },
+        "signal_health": {
+          "scope": {
+            "line_id": "L2"
+          },
+          "median_ms": 73.88,
+          "min_ms": 73.17,
+          "max_ms": 75.19,
+          "ml_median_ms": 18.56,
+          "cpu_median_ms": 73.88,
+          "rows": 14,
+          "dbscan_path": null
+        }
+      },
+      "answer_ms": 591.4,
+      "answer_cpu_ms": 968.6
+    },
+    "M": {
+      "plant": {
+        "plant_id": "plant-40m-s7",
+        "machines": 40,
+        "days": 30,
+        "stops": 41991,
+        "cycles": 303420,
+        "machine_hours": 16720,
+        "stops_per_day": 1615.0,
+        "cycles_per_day": 11670.0
+      },
+      "nightly": {
+        "cold": {
+          "wall_ms": 4086.8,
+          "cpu_ms": 6768.9,
+          "tools": {
+            "cluster_stops": {
+              "wall_ms": 866.6,
+              "cpu_ms": 1535.0,
+              "phases_ms": {
+                "prep": 12.06,
+                "init": 8.48,
+                "ml_kmeans": 11.18,
+                "ml_dbscan": 798.58,
+                "post": 33.29,
+                "total": 863.59
+              },
+              "dbscan_path": "stock-tree"
+            },
+            "detect_cycle_drift": {
+              "wall_ms": 1298.6,
+              "cpu_ms": 2032.0,
+              "phases_ms": {
+                "prep": 235.44,
+                "ml_knn": 791.39,
+                "post": 259.43,
+                "total": 1286.26
+              }
+            },
+            "rank_loss_drivers": {
+              "wall_ms": 1346.2,
+              "cpu_ms": 2630.1,
+              "phases_ms": {
+                "prep": 12.17,
+                "ml_rf_fit": 248.32,
+                "ml_rf_permutation": 1073.94,
+                "post": 8.79,
+                "total": 1343.22
+              }
+            },
+            "signal_health": {
+              "wall_ms": 575.4,
+              "cpu_ms": 571.8,
+              "phases_ms": {
+                "prep": 230.67,
+                "ml_pca": 158.36,
+                "post": 174.1,
+                "total": 563.14
+              }
+            }
+          }
+        },
+        "warm": {
+          "wall_ms": 4328.2,
+          "cpu_ms": 7193.1,
+          "tools": {
+            "cluster_stops": {
+              "wall_ms": 861.8,
+              "cpu_ms": 1564.7,
+              "phases_ms": {
+                "prep": 14.33,
+                "init": 10.57,
+                "ml_kmeans": 12.0,
+                "ml_dbscan": 783.1,
+                "post": 39.12,
+                "total": 859.11
+              },
+              "dbscan_path": "stock-tree"
+            },
+            "detect_cycle_drift": {
+              "wall_ms": 1379.6,
+              "cpu_ms": 2156.7,
+              "phases_ms": {
+                "prep": 254.77,
+                "ml_knn": 854.31,
+                "post": 257.69,
+                "total": 1366.77
+              }
+            },
+            "rank_loss_drivers": {
+              "wall_ms": 1469.2,
+              "cpu_ms": 2861.0,
+              "phases_ms": {
+                "prep": 12.24,
+                "ml_rf_fit": 291.04,
+                "ml_rf_permutation": 1154.34,
+                "post": 8.6,
+                "total": 1466.21
+              }
+            },
+            "signal_health": {
+              "wall_ms": 617.5,
+              "cpu_ms": 610.5,
+              "phases_ms": {
+                "prep": 242.41,
+                "ml_pca": 171.26,
+                "post": 188.04,
+                "total": 601.71
+              }
+            }
+          }
+        },
+        "all_wall_ms": [
+          4086.8,
+          4072.0,
+          4328.2
+        ]
+      },
+      "on_demand": {
+        "cluster_stops": {
+          "scope": {
+            "line_id": "L3",
+            "day_from": 23
+          },
+          "median_ms": 36.97,
+          "min_ms": 33.24,
+          "max_ms": 38.8,
+          "ml_median_ms": 7.31,
+          "cpu_median_ms": 43.65,
+          "rows": 2645,
+          "dbscan_path": "onedal-brute"
+        },
+        "detect_cycle_drift": {
+          "scope": {
+            "line_id": "L3"
+          },
+          "median_ms": 335.51,
+          "min_ms": 326.2,
+          "max_ms": 339.56,
+          "ml_median_ms": 211.69,
+          "cpu_median_ms": 524.64,
+          "rows": 25,
+          "dbscan_path": null
+        },
+        "rank_loss_drivers": {
+          "scope": {
+            "line_id": "L3"
+          },
+          "median_ms": 531.75,
+          "min_ms": 499.07,
+          "max_ms": 546.99,
+          "ml_median_ms": 518.17,
+          "cpu_median_ms": 1035.91,
+          "rows": 4201,
+          "dbscan_path": null
+        },
+        "signal_health": {
+          "scope": {
+            "line_id": "L3"
+          },
+          "median_ms": 121.77,
+          "min_ms": 108.95,
+          "max_ms": 123.4,
+          "ml_median_ms": 34.23,
+          "cpu_median_ms": 121.65,
+          "rows": 25,
+          "dbscan_path": null
+        }
+      },
+      "answer_ms": 1026.0,
+      "answer_cpu_ms": 1725.9
+    },
+    "L": {
+      "plant": {
+        "plant_id": "plant-120m-s7",
+        "machines": 120,
+        "days": 30,
+        "stops": 118602,
+        "cycles": 900349,
+        "machine_hours": 47440,
+        "stops_per_day": 4561.6,
+        "cycles_per_day": 34628.8
+      },
+      "nightly": {
+        "cold": {
+          "wall_ms": 12108.8,
+          "cpu_ms": 20460.4,
+          "tools": {
+            "cluster_stops": {
+              "wall_ms": 5016.3,
+              "cpu_ms": 9443.8,
+              "phases_ms": {
+                "prep": 38.86,
+                "init": 30.4,
+                "ml_kmeans": 29.15,
+                "ml_dbscan": 4842.21,
+                "post": 71.32,
+                "total": 5011.93
+              },
+              "dbscan_path": "stock-tree"
+            },
+            "detect_cycle_drift": {
+              "wall_ms": 3726.2,
+              "cpu_ms": 5821.8,
+              "phases_ms": {
+                "prep": 715.78,
+                "ml_knn": 2299.82,
+                "post": 676.27,
+                "total": 3691.87
+              }
+            },
+            "rank_loss_drivers": {
+              "wall_ms": 1951.9,
+              "cpu_ms": 3784.0,
+              "phases_ms": {
+                "prep": 33.59,
+                "ml_rf_fit": 680.63,
+                "ml_rf_permutation": 1224.75,
+                "post": 9.19,
+                "total": 1948.16
+              }
+            },
+            "signal_health": {
+              "wall_ms": 1414.3,
+              "cpu_ms": 1410.8,
+              "phases_ms": {
+                "prep": 594.26,
+                "ml_pca": 368.58,
+                "post": 418.99,
+                "total": 1381.83
+              }
+            }
+          }
+        },
+        "warm": {
+          "wall_ms": 11941.2,
+          "cpu_ms": 20014.7,
+          "tools": {
+            "cluster_stops": {
+              "wall_ms": 4595.7,
+              "cpu_ms": 8547.0,
+              "phases_ms": {
+                "prep": 37.15,
+                "init": 28.43,
+                "ml_kmeans": 32.8,
+                "ml_dbscan": 4427.61,
+                "post": 66.15,
+                "total": 4592.15
+              },
+              "dbscan_path": "stock-tree"
+            },
+            "detect_cycle_drift": {
+              "wall_ms": 3571.3,
+              "cpu_ms": 5646.0,
+              "phases_ms": {
+                "prep": 682.11,
+                "ml_knn": 2161.21,
+                "post": 695.35,
+                "total": 3538.66
+              }
+            },
+            "rank_loss_drivers": {
+              "wall_ms": 2151.4,
+              "cpu_ms": 4201.8,
+              "phases_ms": {
+                "prep": 27.83,
+                "ml_rf_fit": 844.87,
+                "ml_rf_permutation": 1264.4,
+                "post": 10.25,
+                "total": 2147.36
+              }
+            },
+            "signal_health": {
+              "wall_ms": 1622.7,
+              "cpu_ms": 1619.9,
+              "phases_ms": {
+                "prep": 644.47,
+                "ml_pca": 444.89,
+                "post": 498.64,
+                "total": 1587.99
+              }
+            }
+          }
+        },
+        "all_wall_ms": [
+          12108.8,
+          11542.4,
+          11941.2
+        ]
+      },
+      "on_demand": {
+        "cluster_stops": {
+          "scope": {
+            "line_id": "L3",
+            "day_from": 23
+          },
+          "median_ms": 33.15,
+          "min_ms": 32.51,
+          "max_ms": 34.88,
+          "ml_median_ms": 6.99,
+          "cpu_median_ms": 40.24,
+          "rows": 2592,
+          "dbscan_path": "onedal-brute"
+        },
+        "detect_cycle_drift": {
+          "scope": {
+            "line_id": "L3"
+          },
+          "median_ms": 320.93,
+          "min_ms": 312.29,
+          "max_ms": 340.35,
+          "ml_median_ms": 186.67,
+          "cpu_median_ms": 498.63,
+          "rows": 26,
+          "dbscan_path": null
+        },
+        "rank_loss_drivers": {
+          "scope": {
+            "line_id": "L3"
+          },
+          "median_ms": 542.91,
+          "min_ms": 515.67,
+          "max_ms": 589.07,
+          "ml_median_ms": 530.69,
+          "cpu_median_ms": 1061.43,
+          "rows": 4228,
+          "dbscan_path": null
+        },
+        "signal_health": {
+          "scope": {
+            "line_id": "L3"
+          },
+          "median_ms": 144.45,
+          "min_ms": 143.8,
+          "max_ms": 152.22,
+          "ml_median_ms": 36.01,
+          "cpu_median_ms": 144.46,
+          "rows": 26,
+          "dbscan_path": null
+        }
+      },
+      "answer_ms": 1041.4,
+      "answer_cpu_ms": 1744.8
+    }
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "$comment": "Tool definitions for the plant agent (Anthropic tool-use / MCP input_schema format). The agent never computes losses itself: it calls these and quotes only text from the returned `facts`, citing their ids.",
+  "definitions": {
+    "scope": {
+      "type": "object",
+      "description": "Which machines and days to analyse. Omit for the whole plant. Days are plant day indices; tools that compare a recent window against a baseline choose their own windows and only use day_to.",
+      "properties": {
+        "line_id": {"type": "string", "description": "Production line, e.g. 'L3'."},
+        "machine_ids": {"type": "array", "items": {"type": "string"}, "description": "Explicit machines, e.g. ['M017','M020']."},
+        "day_from": {"type": "integer", "minimum": 0},
+        "day_to": {"type": "integer", "minimum": 0}
+      },
+      "additionalProperties": false
+    }
+  },
+  "tools": [
+    {
+      "name": "cluster_stops",
+      "description": "Groups stop events into families (k-means) and separates recurring patterns from irregular stops (DBSCAN). Returns, per family: stops, hours stopped, median duration, typical time of day, share without a reason, a suggested reason with confidence, and the machines with most time. Also lists the longest irregular stops. Use for: 'where did the time go', 'which stops have no reason', 'what were the unusual stops'.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "scope": {"$ref": "#/definitions/scope"},
+          "k": {"type": "integer", "minimum": 3, "maximum": 20, "default": 10, "description": "Number of families."},
+          "min_confidence": {"type": "number", "minimum": 0.5, "maximum": 1.0, "default": 0.6, "description": "Minimum share of justified stops agreeing on a reason before a family gets a suggestion."}
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "detect_cycle_drift",
+      "description": "Finds machines whose recent part cycles left their normal envelope (nearest-neighbour distance in a 6-signal space, per machine and program, last 7 days vs the 21 days before). Returns flagged machines with cycle-time change in %, share of cycles outside the envelope, estimated start date and the signals that moved most. New programs without a baseline are listed, not scored. Use for: 'is anything getting slower', 'why is output down on machine X'.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "scope": {"$ref": "#/definitions/scope"},
+          "test_days": {"type": "integer", "minimum": 2, "maximum": 14, "default": 7},
+          "ref_days": {"type": "integer", "minimum": 7, "maximum": 60, "default": 21}
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "rank_loss_drivers",
+      "description": "Ranks the conditions most associated with unplanned stop minutes per available machine-hour (random forest + permutation importance on held-out hours): supplier batch, shift, tool age, days since maintenance, operator, etc. Returns the ranking, effect sizes for the top drivers, model fit (holdout R²) and confounding caveats. Results are associations, not causes. Use for: 'what drives our losses', 'is supplier X worse'.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "scope": {"$ref": "#/definitions/scope"},
+          "target": {"type": "string", "enum": ["unplanned_rate", "unplanned_minutes", "lost_minutes"], "default": "unplanned_rate"}
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "signal_health",
+      "description": "Checks whether each machine's 12 signals (loads, speeds, currents, vibration, temperatures, coolant) still move together the way they did in the reference window (PCA, SPE and Hotelling T² per machine and program). Returns abnormal machines, the share of abnormal cycles, the start date and the signals that deviate most. Catches faults that do not change cycle time (e.g. a weakening coolant pump). Use for: 'anything wrong with the machines', maintenance questions.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "scope": {"$ref": "#/definitions/scope"},
+          "test_days": {"type": "integer", "minimum": 2, "maximum": 14, "default": 7},
+          "ref_days": {"type": "integer", "minimum": 7, "maximum": 60, "default": 21}
+        },
+        "additionalProperties": false
+      }
+    }
+  ],
+  "envelope": {
+    "$comment": "Every tool returns this shape. Only `facts[].text` may be quoted; cite as [<facts[].id>]. If parity.citable is false, re-run on the stock backend or answer without the number.",
+    "type": "object",
+    "required": ["tool", "tool_version", "call_id", "scope", "params", "input_fingerprint", "backend", "parity", "timings_ms", "result", "facts"],
+    "properties": {
+      "tool": {"type": "string"},
+      "tool_version": {"type": "string"},
+      "call_id": {"type": "string", "description": "Deterministic id: same tool, params, data and backend give the same id."},
+      "scope": {"$ref": "#/definitions/scope"},
+      "params": {"type": "object"},
+      "input_fingerprint": {"type": "string"},
+      "backend": {"type": "object", "properties": {"backend": {"enum": ["stock", "onedal"]}, "sklearn": {"type": "string"}, "sklearnex": {"type": "string"}, "onedal": {"type": "string"}}},
+      "parity": {"type": "object", "properties": {"citable": {"type": "boolean"}, "reason": {"type": "string"}, "checked_at": {"type": "string"}}},
+      "timings_ms": {"type": "object", "additionalProperties": {"type": "number"}},
+      "result": {"type": "object"},
+      "facts": {"type": "array", "items": {"type": "object", "required": ["id", "text"], "properties": {"id": {"type": "string"}, "text": {"type": "string"}}}}
+    }
+  }
+}
