@@ -1,0 +1,311 @@
+{
+  "size": "M",
+  "seed": 7,
+  "repeats": 5,
+  "cases": [
+    {
+      "case": "stock",
+      "threads_limited": false,
+      "thread_env": {
+        "OMP_NUM_THREADS": null,
+        "MKL_NUM_THREADS": null,
+        "OPENBLAS_NUM_THREADS": null,
+        "NUMEXPR_NUM_THREADS": null,
+        "VECLIB_MAXIMUM_THREADS": null,
+        "TBB_NUM_THREADS": null,
+        "DAAL_NUM_THREADS": null
+      },
+      "pools_after_import": [],
+      "pools_after_run": [
+        {
+          "user_api": "blas",
+          "internal_api": "openblas",
+          "num_threads": 12,
+          "prefix": "libscipy_openblas"
+        },
+        {
+          "user_api": "openmp",
+          "internal_api": "openmp",
+          "num_threads": 12,
+          "prefix": "vcomp"
+        },
+        {
+          "user_api": "blas",
+          "internal_api": "openblas",
+          "num_threads": 12,
+          "prefix": "libscipy_openblas"
+        }
+      ],
+      "n": 5,
+      "median_ms": 328.95,
+      "min_ms": 315.35,
+      "max_ms": 333.83
+    },
+    {
+      "case": "import_sklearnex",
+      "threads_limited": false,
+      "thread_env": {
+        "OMP_NUM_THREADS": null,
+        "MKL_NUM_THREADS": null,
+        "OPENBLAS_NUM_THREADS": null,
+        "NUMEXPR_NUM_THREADS": null,
+        "VECLIB_MAXIMUM_THREADS": null,
+        "TBB_NUM_THREADS": null,
+        "DAAL_NUM_THREADS": null
+      },
+      "pools_after_import": [
+        {
+          "user_api": "blas",
+          "internal_api": "openblas",
+          "num_threads": 12,
+          "prefix": "libscipy_openblas"
+        },
+        {
+          "user_api": "openmp",
+          "internal_api": "openmp",
+          "num_threads": 12,
+          "prefix": "vcomp"
+        },
+        {
+          "user_api": "blas",
+          "internal_api": "openblas",
+          "num_threads": 12,
+          "prefix": "libscipy_openblas"
+        }
+      ],
+      "pools_after_run": [
+        {
+          "user_api": "blas",
+          "internal_api": "openblas",
+          "num_threads": 12,
+          "prefix": "libscipy_openblas"
+        },
+        {
+          "user_api": "openmp",
+          "internal_api": "openmp",
+          "num_threads": 12,
+          "prefix": "vcomp"
+        },
+        {
+          "user_api": "blas",
+          "internal_api": "openblas",
+          "num_threads": 12,
+          "prefix": "libscipy_openblas"
+        }
+      ],
+      "n": 5,
+      "median_ms": 311.34,
+      "min_ms": 299.08,
+      "max_ms": 313.97
+    },
+    {
+      "case": "after_rf",
+      "threads_limited": false,
+      "thread_env": {
+        "OMP_NUM_THREADS": null,
+        "MKL_NUM_THREADS": null,
+        "OPENBLAS_NUM_THREADS": null,
+        "NUMEXPR_NUM_THREADS": null,
+        "VECLIB_MAXIMUM_THREADS": null,
+        "TBB_NUM_THREADS": null,
+        "DAAL_NUM_THREADS": null
+      },
+      "pools_after_import": [
+        {
+          "user_api": "blas",
+          "internal_api": "openblas",
+          "num_threads": 12,
+          "prefix": "libscipy_openblas"
+        },
+        {
+          "user_api": "openmp",
+          "internal_api": "openmp",
+          "num_threads": 12,
+          "prefix": "vcomp"
+        },
+        {
+          "user_api": "blas",
+          "internal_api": "openblas",
+          "num_threads": 12,
+          "prefix": "libscipy_openblas"
+        }
+      ],
+      "pools_after_run": [
+        {
+          "user_api": "blas",
+          "internal_api": "openblas",
+          "num_threads": 12,
+          "prefix": "libscipy_openblas"
+        },
+        {
+          "user_api": "openmp",
+          "internal_api": "openmp",
+          "num_threads": 12,
+          "prefix": "vcomp"
+        },
+        {
+          "user_api": "blas",
+          "internal_api": "openblas",
+          "num_threads": 12,
+          "prefix": "libscipy_openblas"
+        }
+      ],
+      "n": 5,
+      "median_ms": 310.63,
+      "min_ms": 301.21,
+      "max_ms": 322.8
+    },
+    {
+      "case": "threads1_stock",
+      "threads_limited": true,
+      "thread_env": {
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "NUMEXPR_NUM_THREADS": "1",
+        "VECLIB_MAXIMUM_THREADS": "1",
+        "TBB_NUM_THREADS": "1",
+        "DAAL_NUM_THREADS": "1"
+      },
+      "pools_after_import": [],
+      "pools_after_run": [
+        {
+          "user_api": "blas",
+          "internal_api": "openblas",
+          "num_threads": 1,
+          "prefix": "libscipy_openblas"
+        },
+        {
+          "user_api": "openmp",
+          "internal_api": "openmp",
+          "num_threads": 1,
+          "prefix": "vcomp"
+        },
+        {
+          "user_api": "blas",
+          "internal_api": "openblas",
+          "num_threads": 1,
+          "prefix": "libscipy_openblas"
+        }
+      ],
+      "n": 5,
+      "median_ms": 305.2,
+      "min_ms": 212.27,
+      "max_ms": 385.02
+    },
+    {
+      "case": "threads1_import_sklearnex",
+      "threads_limited": true,
+      "thread_env": {
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "NUMEXPR_NUM_THREADS": "1",
+        "VECLIB_MAXIMUM_THREADS": "1",
+        "TBB_NUM_THREADS": "1",
+        "DAAL_NUM_THREADS": "1"
+      },
+      "pools_after_import": [
+        {
+          "user_api": "blas",
+          "internal_api": "openblas",
+          "num_threads": 1,
+          "prefix": "libscipy_openblas"
+        },
+        {
+          "user_api": "openmp",
+          "internal_api": "openmp",
+          "num_threads": 1,
+          "prefix": "vcomp"
+        },
+        {
+          "user_api": "blas",
+          "internal_api": "openblas",
+          "num_threads": 1,
+          "prefix": "libscipy_openblas"
+        }
+      ],
+      "pools_after_run": [
+        {
+          "user_api": "blas",
+          "internal_api": "openblas",
+          "num_threads": 1,
+          "prefix": "libscipy_openblas"
+        },
+        {
+          "user_api": "openmp",
+          "internal_api": "openmp",
+          "num_threads": 1,
+          "prefix": "vcomp"
+        },
+        {
+          "user_api": "blas",
+          "internal_api": "openblas",
+          "num_threads": 1,
+          "prefix": "libscipy_openblas"
+        }
+      ],
+      "n": 5,
+      "median_ms": 205.05,
+      "min_ms": 166.09,
+      "max_ms": 236.32
+    },
+    {
+      "case": "threads1_after_rf",
+      "threads_limited": true,
+      "thread_env": {
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "NUMEXPR_NUM_THREADS": "1",
+        "VECLIB_MAXIMUM_THREADS": "1",
+        "TBB_NUM_THREADS": "1",
+        "DAAL_NUM_THREADS": "1"
+      },
+      "pools_after_import": [
+        {
+          "user_api": "blas",
+          "internal_api": "openblas",
+          "num_threads": 1,
+          "prefix": "libscipy_openblas"
+        },
+        {
+          "user_api": "openmp",
+          "internal_api": "openmp",
+          "num_threads": 1,
+          "prefix": "vcomp"
+        },
+        {
+          "user_api": "blas",
+          "internal_api": "openblas",
+          "num_threads": 1,
+          "prefix": "libscipy_openblas"
+        }
+      ],
+      "pools_after_run": [
+        {
+          "user_api": "blas",
+          "internal_api": "openblas",
+          "num_threads": 1,
+          "prefix": "libscipy_openblas"
+        },
+        {
+          "user_api": "openmp",
+          "internal_api": "openmp",
+          "num_threads": 1,
+          "prefix": "vcomp"
+        },
+        {
+          "user_api": "blas",
+          "internal_api": "openblas",
+          "num_threads": 1,
+          "prefix": "libscipy_openblas"
+        }
+      ],
+      "n": 5,
+      "median_ms": 217.31,
+      "min_ms": 201.25,
+      "max_ms": 255.63
+    }
+  ]
+}

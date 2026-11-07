@@ -51,7 +51,9 @@ Plan: add `--seeds` (default remains the single `--seed`, 7), report p50 and p90
 
 Files: `bench/run_bench.py`, `bench/report.py`, `bench/kernels.py`, `tests/test_bench.py`, `CHANGELOG.md`, `PROGRESS.md`.
 
-Outcome: `tests/test_bench.py` passed, including the Xeon bench JSON (plant M answer milliseconds unchanged) and a synthetic p50–p90 column. Thread caps are checked by `python -m bench.kernels --threads 1 --dump-threads`. The timed scratch run is recorded below once `results/_scratch` exists.
+Outcome: `tests/test_bench.py` passed, including the Xeon bench JSON (plant M answer milliseconds unchanged) and a synthetic p50–p90 column. Thread caps are checked by `python -m bench.kernels --threads 1 --dump-threads`.
+
+Scratch run after that commit: `python -m bench.run_bench --sizes M --repeats 3 --out results/_scratch` (gitignored), exit 0 in 737s. From `results/_scratch/summary.md`, plant M, seed 7, 3 repeats: one answer 11,500 → 1,721 ms (p50–p90 stock 168–187 / 2,955–3,069 / 7,936–7,946 / 440–442 ms by tool). Suggested routing on this CPU: `PLANT_TOOLS_DBSCAN_BRUTE_MAX=80000`, `PLANT_TOOLS_PCA_MIN_ROWS=8000`. The Xeon file suggests 20000 and 8000 (`results/intel-xeon-2t/summary.md`). Thread sweep speed-ups at the largest input, 1 / 2 / 12 threads: dbscan 0.4 / 0.43 / 0.49, knn 1.76 / 2.78 / 4.41, pca 2.43 / 3.01 / 3.1.
 
 ## 0.6 Windows
 
@@ -68,3 +70,15 @@ Plan: `bench/deck_numbers.py` reads a benchmark directory and writes `deck_numbe
 Files: `bench/deck_numbers.py`, `tests/test_deck.py`, `results/intel-xeon-2t/deck_numbers.md`, `CHANGELOG.md`, `PROGRESS.md`.
 
 Outcome: `tests/test_deck.py` passed. The generated table matches the talk figures: one answer S 3,775 → 591 ms, M 4,104 → 1,026 ms, L 4,222 → 1,041 ms; plant M tools 51 → 37, 1,003 → 336, 2,941 → 532, 109 → 122 ms; stop suggestions 85.4%, 98.0%, 67.2%.
+
+## 0.8 Edge run
+
+This machine is a 12th Gen Intel Core i5-12450H (12 logical processors), not an Intel Core Ultra 5 NUC and not a plant edge PC. The full edge benchmark was not run. The size-M scratch numbers above are a laptop reference only. Routing differs from the Xeon: DBSCAN brute max 80,000 here versus 20,000 in `results/intel-xeon-2t/summary.md`. PCA minimum stays 8,000 on both.
+
+## 1.1 signal_health slowdown
+
+Plan: in fresh processes, time stock `signal_health` with and without sklearnex imported, with and without a prior oneDAL forest fit, and with thread env vars set to 1. Record threadpoolctl pools. Change the tool only if a clean fix shows up and parity still passes.
+
+Files: `bench/probe_signal_health.py`, `results/findings/signal-health-slowdown.json`, `docs/findings/signal-health-slowdown.md`, `CHANGELOG.md`, `PROGRESS.md`.
+
+Outcome: not found on this CPU. Stock line-L1 median 328.95 ms; after `import sklearnex` 311.34 ms; after a forest fit 310.63 ms. At 1 thread: 305.2, 205.05, 217.31 ms. threadpoolctl showed OpenBLAS and MSVC OpenMP only, no TBB pool. The on-demand tool in `results/_scratch/summary.md` is faster in the oneDAL process (440 → 284 ms), the opposite of the Xeon (109 → 122 ms). No code change.
