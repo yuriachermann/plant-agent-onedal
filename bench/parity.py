@@ -115,8 +115,8 @@ def main(argv=None):
         print(f"{name:20s} {'PASS' if ok_all else 'FAIL'}  " +
               "  ".join(f"{s}: " + json.dumps({k: v for k, v in m.items() if k not in ('dispatch', 'pass')}, default=str)
                         for s, m in per_scope.items()))
-    (out / "parity.json").write_text(json.dumps(record, indent=2, default=str))
-    (out / "parity_report.md").write_text(_report(record))
+    (out / "parity.json").write_text(json.dumps(record, indent=2, default=str), encoding="utf-8")
+    (out / "parity_report.md").write_text(_report(record), encoding="utf-8")
     print("wrote", out / "parity.json")
     return 0 if all_ok else 1
 

@@ -30,6 +30,13 @@ QUESTION = "Why did Line {line} lose output this week?"
 BOLD, DIM, GRN, RED, BLU, END = "\033[1m", "\033[2m", "\033[32m", "\033[31m", "\033[34m", "\033[0m"
 
 
+def color(code: str) -> str:
+    """ANSI when stdout is a terminal. Plain text for pipes, logs, and NO_COLOR."""
+    if os.environ.get("NO_COLOR") or not sys.stdout.isatty():
+        return ""
+    return code
+
+
 def plan(plant, line: str) -> list[tuple[str, dict]]:
     """What the model would decide to call for a 'why did line X lose output' question."""
     return [
@@ -82,8 +89,8 @@ def run(backend: str, size: str, seed: int, line: str, inject_error: bool, quiet
     plant = generate_plant(size, seed=seed)
     q = QUESTION.format(line=line[1:] if line.startswith("L") else line)
     say = (lambda *a: None) if quiet else print
-    say(f"\n{BOLD}User:{END} {q}\n{DIM}backend: {backend} · plant {plant.summary()['machines']} machines · "
-        f"{plant.summary()['stops_per_day']:.0f} stops/day{END}\n")
+    say(f"\n{color(BOLD)}User:{color(END)} {q}\n{color(DIM)}backend: {backend} · plant {plant.summary()['machines']} machines · "
+        f"{plant.summary()['stops_per_day']:.0f} stops/day{color(END)}\n")
     envs, trace = {}, []
     t_all = time.perf_counter()
     for name, scope in plan(plant, line):
@@ -93,8 +100,8 @@ def run(backend: str, size: str, seed: int, line: str, inject_error: bool, quiet
         envs[name] = env
         trace.append({"tool": name, "scope": scope, "ms": round(ms, 1), "call_id": env["call_id"],
                       "citable": env["parity"]["citable"], "facts": len(env["facts"])})
-        mark = f"{GRN}citable{END}" if env["parity"]["citable"] else f"{RED}NOT citable: {env['parity']['reason']}{END}"
-        say(f"  {BLU}→ {name}{END}({json.dumps(scope)})  {BOLD}{ms:7.0f} ms{END}  {env['call_id']}  {len(env['facts'])} facts  {mark}")
+        mark = f"{color(GRN)}citable{color(END)}" if env["parity"]["citable"] else f"{color(RED)}NOT citable: {env['parity']['reason']}{color(END)}"
+        say(f"  {color(BLU)}→ {name}{color(END)}({json.dumps(scope)})  {color(BOLD)}{ms:7.0f} ms{color(END)}  {env['call_id']}  {len(env['facts'])} facts  {mark}")
     tools_ms = (time.perf_counter() - t_all) * 1000
     answer = write_briefing(plant, line, envs)
     if inject_error:
@@ -102,14 +109,14 @@ def run(backend: str, size: str, seed: int, line: str, inject_error: bool, quiet
         answer += (f"\nM021 lost 37% more time than last week [{f1}]."
                    "\nNight shift is 2.4 times worse than day shift.")
     problems = check_answer(answer, list(envs.values()))
-    say(f"\n  {DIM}tool time for this answer: {tools_ms:.0f} ms{END}\n")
-    say(f"{BOLD}Agent:{END}\n{answer}\n")
+    say(f"\n  {color(DIM)}tool time for this answer: {tools_ms:.0f} ms{color(END)}\n")
+    say(f"{color(BOLD)}Agent:{color(END)}\n{answer}\n")
     if problems:
-        say(f"{RED}{BOLD}Citation check: {len(problems)} problem(s), answer blocked{END}")
+        say(f"{color(RED)}{color(BOLD)}Citation check: {len(problems)} problem(s), answer blocked{color(END)}")
         for p in problems:
-            say(f"  {RED}✗{END} {p['problem']}  {DIM}← {p['sentence'][:90]}{END}")
+            say(f"  {color(RED)}✗{color(END)} {p['problem']}  {color(DIM)}← {p['sentence'][:90]}{color(END)}")
     else:
-        say(f"{GRN}{BOLD}Citation check: every number traces to a cited, citable fact ✓{END}")
+        say(f"{color(GRN)}{color(BOLD)}Citation check: every number traces to a cited, citable fact ✓{color(END)}")
     rec = {"backend": backend, "question": q, "tools_ms": round(tools_ms, 1), "trace": trace, "answer": answer,
            "citation_problems": problems, "envelopes": envs}
     out = REPO / "results" / f"demo_trace_{backend}.json"
@@ -118,7 +125,20 @@ def run(backend: str, size: str, seed: int, line: str, inject_error: bool, quiet
     return rec
 
 
+def _configure_stdio() -> None:
+    """Fact text includes σ. A Windows console on cp1252 cannot encode that."""
+    for stream in (sys.stdout, sys.stderr):
+        reconfigure = getattr(stream, "reconfigure", None)
+        if reconfigure is None:
+            continue
+        try:
+            reconfigure(encoding="utf-8", errors="replace")
+        except (OSError, ValueError):
+            pass
+
+
 def main(argv=None):
+    _configure_stdio()
     ap = argparse.ArgumentParser()
     ap.add_argument("--backend", choices=["stock", "onedal"], default="onedal")
     ap.add_argument("--size", default="M")
@@ -138,12 +158,12 @@ def main(argv=None):
         subprocess.run([sys.executable, "-m", "demo.agent_demo", "--backend", be, "--size", args.size, "--seed",
                         str(args.seed), "--line", args.line, "--quiet"], check=True, cwd=REPO, env=env)
         recs[be] = json.loads((REPO / "results" / f"demo_trace_{be}.json").read_text())
-    print(f"\n{BOLD}{recs['stock']['question']}{END}  (fresh process per backend, first call included)\n")
+    print(f"\n{color(BOLD)}{recs['stock']['question']}{color(END)}  (fresh process per backend, first call included)\n")
     print(f"  {'tool call':22s} {'stock':>9s} {'oneDAL':>9s} {'speed-up':>9s}")
     for a, b in zip(recs["stock"]["trace"], recs["onedal"]["trace"]):
         print(f"  {a['tool']:22s} {a['ms']:7.0f} ms {b['ms']:7.0f} ms {a['ms'] / b['ms']:8.1f}×")
     s, o = recs["stock"]["tools_ms"], recs["onedal"]["tools_ms"]
-    print(f"  {BOLD}{'whole answer':22s} {s:7.0f} ms {o:7.0f} ms {s / o:8.1f}×{END}")
+    print(f"  {color(BOLD)}{'whole answer':22s} {s:7.0f} ms {o:7.0f} ms {s / o:8.1f}×{color(END)}")
     print(f"\n  Same facts from both backends (ignoring call ids): "
           f"{_same_facts(recs['stock'], recs['onedal'])}")
 

@@ -52,3 +52,11 @@ Plan: add `--seeds` (default remains the single `--seed`, 7), report p50 and p90
 Files: `bench/run_bench.py`, `bench/report.py`, `bench/kernels.py`, `tests/test_bench.py`, `CHANGELOG.md`, `PROGRESS.md`.
 
 Outcome: `tests/test_bench.py` passed, including the Xeon bench JSON (plant M answer milliseconds unchanged) and a synthetic p50–p90 column. Thread caps are checked by `python -m bench.kernels --threads 1 --dump-threads`. The timed scratch run is recorded below once `results/_scratch` exists.
+
+## 0.6 Windows
+
+Plan: read CPU and RAM through PowerShell CIM, skip `/proc` on Windows, and emit ANSI only when stdout is a terminal. Write UTF-8 so σ, × and arrows survive cp1252 consoles.
+
+Files: `bench/run_bench.py` (machine info, in the 0.5 commit), `demo/agent_demo.py`, `bench/parity.py`, `bench/evaluate.py`, `tests/test_platform.py`, `CHANGELOG.md`, `PROGRESS.md`.
+
+Outcome: `tests/test_platform.py` passed on this host (12th Gen Intel Core i5-12450H, memory reported). `python -m demo.agent_demo --size S --backend stock --line L1` with stdout redirected: exit 0, no ESC bytes, citation check passed. The default line L3 is absent on a size-S plant (two lines), so that combination still has an empty driver scope.

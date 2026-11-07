@@ -288,8 +288,8 @@ def run(seeds: list[int], sizes: list[str], backend: str, out: Path) -> dict:
         "by_size": {size: aggregate([r for r in runs if r["size"] == size]) for size in sizes},
     }
     out.mkdir(parents=True, exist_ok=True)
-    (out / "summary.json").write_text(json.dumps(summary, indent=2))
-    (out / "summary.md").write_text(render_md(summary))
+    (out / "summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
+    (out / "summary.md").write_text(render_md(summary), encoding="utf-8")
     print("wrote", out / "summary.md")
     return summary
 
