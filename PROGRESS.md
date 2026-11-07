@@ -82,3 +82,11 @@ Plan: in fresh processes, time stock `signal_health` with and without sklearnex 
 Files: `bench/probe_signal_health.py`, `results/findings/signal-health-slowdown.json`, `docs/findings/signal-health-slowdown.md`, `CHANGELOG.md`, `PROGRESS.md`.
 
 Outcome: not found on this CPU. Stock line-L1 median 328.95 ms; after `import sklearnex` 311.34 ms; after a forest fit 310.63 ms. At 1 thread: 305.2, 205.05, 217.31 ms. threadpoolctl showed OpenBLAS and MSVC OpenMP only, no TBB pool. The on-demand tool in `results/_scratch/summary.md` is faster in the oneDAL process (440 → 284 ms), the opposite of the Xeon (109 → 122 ms). No code change.
+
+## 1.4 DBSCAN heuristic
+
+Plan: run the current `eps` / `min_samples` rule on seeds 1–10, sizes S and M, whole plant and line L1. Report irregular share and suggestion accuracy. Change the rule only if those move around.
+
+Files: `bench/probe_dbscan.py`, `results/findings/dbscan-heuristic.json`, `docs/findings/dbscan-heuristic.md`, `CHANGELOG.md`, `PROGRESS.md`.
+
+Outcome: no change. Irregular share within a scope spans less than 2 points (plant M 24.1–25.0%, line scopes about 10.6–12.2%). Count accuracy stays at or above 92.8%. Plant M is on the eps floor 0.5 with `min_samples` 30. Minute-weighted accuracy still spans roughly 50–80%, which matches the evaluation grid and is not an eps jump. Table: `docs/findings/dbscan-heuristic.md`.

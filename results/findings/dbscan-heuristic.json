@@ -1,0 +1,657 @@
+{
+  "backend": "stock",
+  "seeds": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "sizes": [
+    "S",
+    "M"
+  ],
+  "groups": {
+    "S-plant": {
+      "irregular_share": {
+        "n": 10,
+        "mean": 0.1477,
+        "min": 0.1419,
+        "max": 0.1574
+      },
+      "coverage_count": {
+        "n": 10,
+        "mean": 0.8708,
+        "min": 0.8516,
+        "max": 0.8993
+      },
+      "accuracy_count": {
+        "n": 10,
+        "mean": 0.9693,
+        "min": 0.9387,
+        "max": 0.9832
+      },
+      "accuracy_minutes": {
+        "n": 10,
+        "mean": 0.6216,
+        "min": 0.5183,
+        "max": 0.783
+      },
+      "eps": [
+        0.5835,
+        0.5844,
+        0.5846,
+        0.5849,
+        0.585,
+        0.5851,
+        0.5855,
+        0.5856,
+        0.586,
+        0.5861
+      ],
+      "min_samples": [
+        10
+      ]
+    },
+    "S-L1": {
+      "irregular_share": {
+        "n": 10,
+        "mean": 0.1139,
+        "min": 0.106,
+        "max": 0.122
+      },
+      "coverage_count": {
+        "n": 10,
+        "mean": 0.8883,
+        "min": 0.8528,
+        "max": 0.9129
+      },
+      "accuracy_count": {
+        "n": 10,
+        "mean": 0.9561,
+        "min": 0.944,
+        "max": 0.9779
+      },
+      "accuracy_minutes": {
+        "n": 10,
+        "mean": 0.5819,
+        "min": 0.5,
+        "max": 0.7067
+      },
+      "eps": [
+        0.6312,
+        0.6324,
+        0.6329,
+        0.633,
+        0.6333,
+        0.6335,
+        0.6336,
+        0.6343,
+        0.6346,
+        0.6354
+      ],
+      "min_samples": [
+        10
+      ]
+    },
+    "M-plant": {
+      "irregular_share": {
+        "n": 10,
+        "mean": 0.2449,
+        "min": 0.2411,
+        "max": 0.25
+      },
+      "coverage_count": {
+        "n": 10,
+        "mean": 0.8739,
+        "min": 0.8491,
+        "max": 0.9065
+      },
+      "accuracy_count": {
+        "n": 10,
+        "mean": 0.9607,
+        "min": 0.9279,
+        "max": 0.9841
+      },
+      "accuracy_minutes": {
+        "n": 10,
+        "mean": 0.6073,
+        "min": 0.5071,
+        "max": 0.7718
+      },
+      "eps": [
+        0.5
+      ],
+      "min_samples": [
+        30
+      ]
+    },
+    "M-L1": {
+      "irregular_share": {
+        "n": 10,
+        "mean": 0.1171,
+        "min": 0.1115,
+        "max": 0.1214
+      },
+      "coverage_count": {
+        "n": 10,
+        "mean": 0.8785,
+        "min": 0.8635,
+        "max": 0.8991
+      },
+      "accuracy_count": {
+        "n": 10,
+        "mean": 0.9682,
+        "min": 0.9439,
+        "max": 0.9813
+      },
+      "accuracy_minutes": {
+        "n": 10,
+        "mean": 0.6486,
+        "min": 0.5413,
+        "max": 0.7993
+      },
+      "eps": [
+        0.6314,
+        0.6325,
+        0.633,
+        0.6337,
+        0.6339,
+        0.6342,
+        0.6343,
+        0.6345,
+        0.6356
+      ],
+      "min_samples": [
+        10
+      ]
+    }
+  },
+  "runs": [
+    {
+      "size": "S",
+      "seed": 1,
+      "scope": "plant",
+      "n": 13154,
+      "eps": 0.5861,
+      "min_samples": 10,
+      "irregular_share": 0.14429071005017485,
+      "coverage_count": 0.8623129251700681,
+      "accuracy_count": 0.9744398863994951,
+      "accuracy_minutes": 0.5911162327920408
+    },
+    {
+      "size": "S",
+      "seed": 1,
+      "scope": "L1",
+      "n": 7477,
+      "eps": 0.6354,
+      "min_samples": 10,
+      "irregular_share": 0.11287949712451519,
+      "coverage_count": 0.8681818181818182,
+      "accuracy_count": 0.9666574813998347,
+      "accuracy_minutes": 0.6152744583701764
+    },
+    {
+      "size": "S",
+      "seed": 2,
+      "scope": "plant",
+      "n": 13419,
+      "eps": 0.5844,
+      "min_samples": 10,
+      "irregular_share": 0.14539086370072285,
+      "coverage_count": 0.8719819580790661,
+      "accuracy_count": 0.9771793701506162,
+      "accuracy_minutes": 0.7830354945269921
+    },
+    {
+      "size": "S",
+      "seed": 2,
+      "scope": "L1",
+      "n": 7634,
+      "eps": 0.6335,
+      "min_samples": 10,
+      "irregular_share": 0.11579774692166624,
+      "coverage_count": 0.8828956706884316,
+      "accuracy_count": 0.9490889603429796,
+      "accuracy_minutes": 0.5472372684396413
+    },
+    {
+      "size": "S",
+      "seed": 3,
+      "scope": "plant",
+      "n": 13241,
+      "eps": 0.5855,
+      "min_samples": 10,
+      "irregular_share": 0.14417340080054378,
+      "coverage_count": 0.89929900242653,
+      "accuracy_count": 0.9415380002998052,
+      "accuracy_minutes": 0.5182861517833633
+    },
+    {
+      "size": "S",
+      "seed": 3,
+      "scope": "L1",
+      "n": 7568,
+      "eps": 0.6343,
+      "min_samples": 10,
+      "irregular_share": 0.10940803382663848,
+      "coverage_count": 0.8528087224460773,
+      "accuracy_count": 0.9769316286826014,
+      "accuracy_minutes": 0.6001960607682403
+    },
+    {
+      "size": "S",
+      "seed": 4,
+      "scope": "plant",
+      "n": 13350,
+      "eps": 0.5849,
+      "min_samples": 10,
+      "irregular_share": 0.14194756554307117,
+      "coverage_count": 0.8618799671142778,
+      "accuracy_count": 0.9785373608903021,
+      "accuracy_minutes": 0.6027129274805081
+    },
+    {
+      "size": "S",
+      "seed": 4,
+      "scope": "L1",
+      "n": 7627,
+      "eps": 0.6336,
+      "min_samples": 10,
+      "irregular_share": 0.12036187229579126,
+      "coverage_count": 0.9092857142857143,
+      "accuracy_count": 0.9439643885833988,
+      "accuracy_minutes": 0.5383217258799257
+    },
+    {
+      "size": "S",
+      "seed": 5,
+      "scope": "plant",
+      "n": 13391,
+      "eps": 0.5846,
+      "min_samples": 10,
+      "irregular_share": 0.1434545590321858,
+      "coverage_count": 0.8515750133475708,
+      "accuracy_count": 0.9752351097178683,
+      "accuracy_minutes": 0.5952294518328899
+    },
+    {
+      "size": "S",
+      "seed": 5,
+      "scope": "L1",
+      "n": 7675,
+      "eps": 0.633,
+      "min_samples": 10,
+      "irregular_share": 0.10697068403908795,
+      "coverage_count": 0.8772175536881419,
+      "accuracy_count": 0.9507716870675892,
+      "accuracy_minutes": 0.5580034976362573
+    },
+    {
+      "size": "S",
+      "seed": 6,
+      "scope": "plant",
+      "n": 13234,
+      "eps": 0.5856,
+      "min_samples": 10,
+      "irregular_share": 0.1563397309959196,
+      "coverage_count": 0.8581162324649299,
+      "accuracy_count": 0.9741553791063366,
+      "accuracy_minutes": 0.570260534500685
+    },
+    {
+      "size": "S",
+      "seed": 6,
+      "scope": "L1",
+      "n": 7680,
+      "eps": 0.6329,
+      "min_samples": 10,
+      "irregular_share": 0.119921875,
+      "coverage_count": 0.9129129129129129,
+      "accuracy_count": 0.9461032388663968,
+      "accuracy_minutes": 0.5000070934455447
+    },
+    {
+      "size": "S",
+      "seed": 7,
+      "scope": "plant",
+      "n": 13573,
+      "eps": 0.5835,
+      "min_samples": 10,
+      "irregular_share": 0.1486775215501363,
+      "coverage_count": 0.8535653090813233,
+      "accuracy_count": 0.9831686226065472,
+      "accuracy_minutes": 0.717312358192579
+    },
+    {
+      "size": "S",
+      "seed": 7,
+      "scope": "L1",
+      "n": 7829,
+      "eps": 0.6312,
+      "min_samples": 10,
+      "irregular_share": 0.11253033593051476,
+      "coverage_count": 0.8767934411295832,
+      "accuracy_count": 0.9532467532467532,
+      "accuracy_minutes": 0.6131642599255384
+    },
+    {
+      "size": "S",
+      "seed": 8,
+      "scope": "plant",
+      "n": 13174,
+      "eps": 0.586,
+      "min_samples": 10,
+      "irregular_share": 0.1465006831638075,
+      "coverage_count": 0.8788946085071796,
+      "accuracy_count": 0.9741060419235512,
+      "accuracy_minutes": 0.6457358891436695
+    },
+    {
+      "size": "S",
+      "seed": 8,
+      "scope": "L1",
+      "n": 7646,
+      "eps": 0.6333,
+      "min_samples": 10,
+      "irregular_share": 0.11352341093382161,
+      "coverage_count": 0.8899555139311637,
+      "accuracy_count": 0.9779005524861878,
+      "accuracy_minutes": 0.7067495950719681
+    },
+    {
+      "size": "S",
+      "seed": 9,
+      "scope": "plant",
+      "n": 13316,
+      "eps": 0.5851,
+      "min_samples": 10,
+      "irregular_share": 0.15740462601381797,
+      "coverage_count": 0.8745954692556634,
+      "accuracy_count": 0.9756398396546407,
+      "accuracy_minutes": 0.6535423488501777
+    },
+    {
+      "size": "S",
+      "seed": 9,
+      "scope": "L1",
+      "n": 7543,
+      "eps": 0.6346,
+      "min_samples": 10,
+      "irregular_share": 0.12196738698130717,
+      "coverage_count": 0.9127962085308057,
+      "accuracy_count": 0.9470404984423676,
+      "accuracy_minutes": 0.5751964096916341
+    },
+    {
+      "size": "S",
+      "seed": 10,
+      "scope": "plant",
+      "n": 13330,
+      "eps": 0.585,
+      "min_samples": 10,
+      "irregular_share": 0.14928732183045762,
+      "coverage_count": 0.8959957000806235,
+      "accuracy_count": 0.9386622675464907,
+      "accuracy_minutes": 0.5391620544832555
+    },
+    {
+      "size": "S",
+      "seed": 10,
+      "scope": "L1",
+      "n": 7724,
+      "eps": 0.6324,
+      "min_samples": 10,
+      "irregular_share": 0.10603314344899016,
+      "coverage_count": 0.900278940027894,
+      "accuracy_count": 0.9493932352181771,
+      "accuracy_minutes": 0.5644775843682562
+    },
+    {
+      "size": "M",
+      "seed": 1,
+      "scope": "plant",
+      "n": 41874,
+      "eps": 0.5,
+      "min_samples": 30,
+      "irregular_share": 0.24279982805559536,
+      "coverage_count": 0.8748502994011976,
+      "accuracy_count": 0.9479319448518627,
+      "accuracy_minutes": 0.5654821957413808
+    },
+    {
+      "size": "M",
+      "seed": 1,
+      "scope": "L1",
+      "n": 7552,
+      "eps": 0.6345,
+      "min_samples": 10,
+      "irregular_share": 0.11361228813559322,
+      "coverage_count": 0.8694622127457948,
+      "accuracy_count": 0.9801089918256131,
+      "accuracy_minutes": 0.6924411166445715
+    },
+    {
+      "size": "M",
+      "seed": 2,
+      "scope": "plant",
+      "n": 42144,
+      "eps": 0.5,
+      "min_samples": 30,
+      "irregular_share": 0.24997627182991647,
+      "coverage_count": 0.8766078882357952,
+      "accuracy_count": 0.9673485253389048,
+      "accuracy_minutes": 0.6110680061108282
+    },
+    {
+      "size": "M",
+      "seed": 2,
+      "scope": "L1",
+      "n": 7619,
+      "eps": 0.6337,
+      "min_samples": 10,
+      "irregular_share": 0.12009450059062869,
+      "coverage_count": 0.8894424673784105,
+      "accuracy_count": 0.956255001333689,
+      "accuracy_minutes": 0.5842057579328022
+    },
+    {
+      "size": "M",
+      "seed": 3,
+      "scope": "plant",
+      "n": 41888,
+      "eps": 0.5,
+      "min_samples": 30,
+      "irregular_share": 0.24961802902979374,
+      "coverage_count": 0.8491228070175438,
+      "accuracy_count": 0.984126184237049,
+      "accuracy_minutes": 0.7717890521434573
+    },
+    {
+      "size": "M",
+      "seed": 3,
+      "scope": "L1",
+      "n": 7595,
+      "eps": 0.6339,
+      "min_samples": 10,
+      "irregular_share": 0.12139565503620803,
+      "coverage_count": 0.8752332089552238,
+      "accuracy_count": 0.9813482547295497,
+      "accuracy_minutes": 0.6931382400398562
+    },
+    {
+      "size": "M",
+      "seed": 4,
+      "scope": "plant",
+      "n": 41632,
+      "eps": 0.5,
+      "min_samples": 30,
+      "irregular_share": 0.24493178324365872,
+      "coverage_count": 0.8612369977124607,
+      "accuracy_count": 0.9806555076676355,
+      "accuracy_minutes": 0.6518366123686476
+    },
+    {
+      "size": "M",
+      "seed": 4,
+      "scope": "L1",
+      "n": 7717,
+      "eps": 0.6325,
+      "min_samples": 10,
+      "irregular_share": 0.11908772839186212,
+      "coverage_count": 0.8882655446470313,
+      "accuracy_count": 0.9694736842105263,
+      "accuracy_minutes": 0.6392778872684273
+    },
+    {
+      "size": "M",
+      "seed": 5,
+      "scope": "plant",
+      "n": 41462,
+      "eps": 0.5,
+      "min_samples": 30,
+      "irregular_share": 0.24323476918624282,
+      "coverage_count": 0.8775075987841945,
+      "accuracy_count": 0.9715968133010046,
+      "accuracy_minutes": 0.6235718144014193
+    },
+    {
+      "size": "M",
+      "seed": 5,
+      "scope": "L1",
+      "n": 7571,
+      "eps": 0.6342,
+      "min_samples": 10,
+      "irregular_share": 0.11834632148989566,
+      "coverage_count": 0.8991395793499044,
+      "accuracy_count": 0.9439128123338649,
+      "accuracy_minutes": 0.5412550230900594
+    },
+    {
+      "size": "M",
+      "seed": 6,
+      "scope": "plant",
+      "n": 41509,
+      "eps": 0.5,
+      "min_samples": 30,
+      "irregular_share": 0.2411284299790407,
+      "coverage_count": 0.8659807185162769,
+      "accuracy_count": 0.9547201837152414,
+      "accuracy_minutes": 0.5702069492959024
+    },
+    {
+      "size": "M",
+      "seed": 6,
+      "scope": "L1",
+      "n": 7568,
+      "eps": 0.6343,
+      "min_samples": 10,
+      "irregular_share": 0.11416490486257928,
+      "coverage_count": 0.8818333731200764,
+      "accuracy_count": 0.9694098538170005,
+      "accuracy_minutes": 0.7993036588732567
+    },
+    {
+      "size": "M",
+      "seed": 7,
+      "scope": "plant",
+      "n": 41991,
+      "eps": 0.5,
+      "min_samples": 30,
+      "irregular_share": 0.24650520349598723,
+      "coverage_count": 0.853676219720232,
+      "accuracy_count": 0.9798671129539891,
+      "accuracy_minutes": 0.6722848266431525
+    },
+    {
+      "size": "M",
+      "seed": 7,
+      "scope": "L1",
+      "n": 7454,
+      "eps": 0.6356,
+      "min_samples": 10,
+      "irregular_share": 0.11913066809766568,
+      "coverage_count": 0.8635164307987527,
+      "accuracy_count": 0.9775,
+      "accuracy_minutes": 0.6825978832017313
+    },
+    {
+      "size": "M",
+      "seed": 8,
+      "scope": "plant",
+      "n": 42164,
+      "eps": 0.5,
+      "min_samples": 30,
+      "irregular_share": 0.24300351010340576,
+      "coverage_count": 0.8704744867535565,
+      "accuracy_count": 0.95424964525126,
+      "accuracy_minutes": 0.5814147067124561
+    },
+    {
+      "size": "M",
+      "seed": 8,
+      "scope": "L1",
+      "n": 7815,
+      "eps": 0.6314,
+      "min_samples": 10,
+      "irregular_share": 0.11900191938579655,
+      "coverage_count": 0.864165890027959,
+      "accuracy_count": 0.9787004583445673,
+      "accuracy_minutes": 0.676729679966745
+    },
+    {
+      "size": "M",
+      "seed": 9,
+      "scope": "plant",
+      "n": 42063,
+      "eps": 0.5,
+      "min_samples": 30,
+      "irregular_share": 0.24596438675320353,
+      "coverage_count": 0.9034177860908009,
+      "accuracy_count": 0.9390175042348955,
+      "accuracy_minutes": 0.5180925061529215
+    },
+    {
+      "size": "M",
+      "seed": 9,
+      "scope": "L1",
+      "n": 7674,
+      "eps": 0.633,
+      "min_samples": 10,
+      "irregular_share": 0.11154547823820693,
+      "coverage_count": 0.8681574656417423,
+      "accuracy_count": 0.9739737053930776,
+      "accuracy_minutes": 0.619569239102841
+    },
+    {
+      "size": "M",
+      "seed": 10,
+      "scope": "plant",
+      "n": 41983,
+      "eps": 0.5,
+      "min_samples": 30,
+      "irregular_share": 0.2422170878688993,
+      "coverage_count": 0.9065096359743041,
+      "accuracy_count": 0.9279066471394152,
+      "accuracy_minutes": 0.5070694422048694
+    },
+    {
+      "size": "M",
+      "seed": 10,
+      "scope": "L1",
+      "n": 7596,
+      "eps": 0.6339,
+      "min_samples": 10,
+      "irregular_share": 0.11427066877303844,
+      "coverage_count": 0.885754918227068,
+      "accuracy_count": 0.9515654268129515,
+      "accuracy_minutes": 0.5571262435602254
+    }
+  ]
+}
