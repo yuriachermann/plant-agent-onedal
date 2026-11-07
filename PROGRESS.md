@@ -36,3 +36,11 @@ Plan: score drift, signal health, loss drivers and stop suggestions against `pla
 Files: `bench/evaluate.py`, `tests/test_evaluate.py`, `results/eval/`, `README.md`, `CHANGELOG.md`, `PROGRESS.md`.
 
 Outcome: `results/eval/summary.json`, stock scikit-learn, 20 plants. Drift precision 100% on the 19 plants that flagged anyone; recall mean 0.5333 (0.45 on S, 0.6167 on M). Coolant recall mean 0.9, healthy-machine false positives 0. Planted drivers in the top 3: mean 0.7125 (shift only 0.10). Any null driver reported: 0.25 of runs. Stop coverage mean 0.8724 by count, accuracy 0.965 by count and 0.6145 by minutes. Plant M seed 7: coverage 0.8537 (85.4%), accuracy 0.9799 (98.0%), accuracy by minutes 0.6723 (67.2%). `pytest -m slow` passed in 289.12s.
+
+## 0.4 Real-data path
+
+Plan: derive machine-hours from stops, cycles and machines, leaving context columns absent. Teach `rank_loss_drivers` to fit on any subset and list the missing features. Document the column map and a generic TimescaleDB export. Test a synthetic plant with context dropped, and the case where `hours.csv` is absent.
+
+Files: `plantgen/derive.py`, `plantgen/io.py`, `plantgen/__init__.py`, `tools/drivers.py`, `tools/common.py`, `tools/schemas.json`, `tests/test_derive.py`, `docs/real-data.md`, `results/parity.json` (tool version 0.2.0), `README.md`, `CHANGELOG.md`, `PROGRESS.md`.
+
+Outcome: derived `unplanned_rate` matches the generator to the stored 0.01 precision (re-splitting rounded durations). Shifts match. `program_new` is first-seen, which is not the generator's hidden intro day. `pytest` after the parity rewrite: tools and derive tests passed (13 in the focused run). `python -m bench.parity` PASS, same metrics as the baseline (plant Spearman 0.9301, ΔR² 0.0017, ARI 1.0). Tool version is now 0.2.0.

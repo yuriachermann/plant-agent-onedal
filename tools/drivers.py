@@ -52,10 +52,20 @@ def rank_loss_drivers(plant, scope: dict | None = None, target: str = "unplanned
         machines = scope_machines(plant, scope)
         d0, d1 = day_range(plant, scope)
         h = select(plant.hours, machines, d0, d1)
+        if target not in h.columns:
+            raise ValueError(f"rank_loss_drivers: hours table has no '{target}' column")
+        missing = [c for c in FEATURES if c not in h.columns]
+        cats = [c for c in CATS if c in h.columns]
+        nums = [c for c in NUMS if c in h.columns]
+        if not cats and not nums:
+            raise ValueError(f"rank_loss_drivers: no usable features; missing {missing}")
         h = h[h[target].notna()].reset_index(drop=True)
+        # Drop incomplete rows only when a present feature has gaps. A full table takes the same path as before.
+        if h[cats + nums].isna().any().any():
+            h = h.dropna(subset=cats + nums).reset_index(drop=True)
         X = np.column_stack([
-            *[pd.Categorical(h[c], categories=sorted(h[c].unique())).codes for c in CATS],
-            *[h[c].to_numpy(np.float64) for c in NUMS],
+            *[pd.Categorical(h[c], categories=sorted(h[c].dropna().unique())).codes for c in cats],
+            *[h[c].to_numpy(np.float64) for c in nums],
         ]).astype(np.float64)
         y = h[target].to_numpy(np.float64)
         rng = np.random.default_rng(seed)
@@ -72,9 +82,10 @@ def rank_loss_drivers(plant, scope: dict | None = None, target: str = "unplanned
         pi = permutation_importance(rf, Xp, yp, n_repeats=n_repeats, random_state=seed, n_jobs=1)
     with T.phase("post"):
         order = np.argsort(-pi.importances_mean, kind="stable")
+        used = cats + nums
         ranking, facts = [], {}
         for rank, j in enumerate(order, 1):
-            f = FEATURES[j]
+            f = used[j]
             ranking.append({"rank": rank, "driver": f, "label": LABEL[f],
                             "importance": round(float(pi.importances_mean[j]), 4),
                             "importance_std": round(float(pi.importances_std[j]), 4)})
@@ -100,15 +111,18 @@ def rank_loss_drivers(plant, scope: dict | None = None, target: str = "unplanned
             "target": target, "hours": int(len(y)), "train_hours": int((~te).sum()), "holdout_hours": int(te.sum()),
             "permutation_rows": int(len(yp)),
             "holdout_r2": round(r2, 4), "ranking": ranking, "caveats": conf,
+            "missing_features": missing,
             "target_hours_total": round(float(y.sum()) / 60, 1),
         }
         what = {"unplanned_rate": "unplanned stop minutes per available hour",  # noqa: E501
                 "unplanned_minutes": "unplanned stop minutes"}.get(target, target.replace("_", " "))
         facts["M"] = (f"Model of {what} on {len(y)} machine-hours over {d1 - d0 + 1} days; holdout R² {r2:.2f}. "
                       "Rankings show association, not cause." + (" " + conf[0] if conf else ""))
+        if missing:
+            facts["M"] += " Missing features, left out rather than filled in: " + ", ".join(missing) + "."
     params = {"target": target, "n_estimators": n_estimators, "max_depth": max_depth,
               "min_samples_leaf": min_samples_leaf, "n_repeats": n_repeats, "holdout": holdout,
               "perm_rows": perm_rows, "relevance": relevance,
-              "seed": seed, "features": FEATURES}
+              "seed": seed, "features": cats + nums, "missing_features": missing}
     return envelope("rank_loss_drivers", scope, params, fingerprint(y, X[:, -3]), result, facts, T,
                     extra={"_importances": pi.importances_mean})

@@ -42,7 +42,7 @@
     },
     {
       "name": "rank_loss_drivers",
-      "description": "Ranks the conditions most associated with unplanned stop minutes per available machine-hour (random forest + permutation importance on held-out hours): supplier batch, shift, tool age, days since maintenance, operator, etc. Returns the ranking, effect sizes for the top drivers, model fit (holdout R²) and confounding caveats. Results are associations, not causes. Use for: 'what drives our losses', 'is supplier X worse'.",
+      "description": "Ranks the conditions most associated with unplanned stop minutes per available machine-hour (random forest + permutation importance on held-out hours): supplier batch, shift, tool age, days since maintenance, operator, etc. Uses whichever of those columns the hours table has. Absent columns are listed in result.missing_features and are not imputed. Returns the ranking, effect sizes for the top drivers, model fit (holdout R²) and confounding caveats. Results are associations, not causes. Use for: 'what drives our losses', 'is supplier X worse'.",
       "input_schema": {
         "type": "object",
         "properties": {

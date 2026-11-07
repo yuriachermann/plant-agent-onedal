@@ -10,6 +10,7 @@ from pathlib import Path
 
 import pandas as pd
 
+from .derive import HOURS_MINIMUM, derive_hours
 from .generator import Plant
 
 SCHEMA = {
@@ -38,11 +39,20 @@ def save_plant(plant: Plant, out: str | Path) -> Path:
 def load_plant(src: str | Path) -> Plant:
     src = Path(src)
     meta = json.loads((src / "plant.json").read_text())
-    tables = {t: pd.read_csv(src / f"{t}.csv", keep_default_na=False if t == "stops" else True)
-              for t in ("machines", "stops", "cycles", "hours")}
-    for t, cols in SCHEMA.items():
-        missing = [c for c in cols if c not in tables[t].columns]
+    tables = {}
+    for t in ("machines", "stops", "cycles"):
+        tables[t] = pd.read_csv(src / f"{t}.csv", keep_default_na=False if t == "stops" else True)
+        missing = [c for c in SCHEMA[t] if c not in tables[t].columns]
         if missing:
             raise ValueError(f"{t}.csv is missing columns: {missing}")
+    hours_path = src / "hours.csv"
+    if hours_path.exists():
+        hours = pd.read_csv(hours_path)
+        missing = [c for c in HOURS_MINIMUM if c not in hours.columns]
+        if missing:
+            raise ValueError(f"hours.csv is missing columns: {missing}")
+    else:
+        hours = derive_hours(tables["machines"], tables["stops"], tables["cycles"],
+                             start=pd.Timestamp(meta["start"]), days=int(meta["days"]))
     return Plant(plant_id=meta["plant_id"], start=pd.Timestamp(meta["start"]), days=int(meta["days"]),
-                 truth=meta.get("truth", {}), **tables)
+                 truth=meta.get("truth", {}), hours=hours, **tables)
