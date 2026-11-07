@@ -60,3 +60,11 @@ Plan: read CPU and RAM through PowerShell CIM, skip `/proc` on Windows, and emit
 Files: `bench/run_bench.py` (machine info, in the 0.5 commit), `demo/agent_demo.py`, `bench/parity.py`, `bench/evaluate.py`, `tests/test_platform.py`, `CHANGELOG.md`, `PROGRESS.md`.
 
 Outcome: `tests/test_platform.py` passed on this host (12th Gen Intel Core i5-12450H, memory reported). `python -m demo.agent_demo --size S --backend stock --line L1` with stdout redirected: exit 0, no ESC bytes, citation check passed. The default line L3 is absent on a size-S plant (two lines), so that combination still has an empty driver scope.
+
+## 0.7 Deck numbers
+
+Plan: `bench/deck_numbers.py` reads a benchmark directory and writes `deck_numbers.md` with each slide figure and its JSON key. Timings come from that directory's `summary.json`. Parity comes from `results/parity.json` when the tag has none. Stop suggestions for M seed 7 come from `results/eval/summary.json`.
+
+Files: `bench/deck_numbers.py`, `tests/test_deck.py`, `results/intel-xeon-2t/deck_numbers.md`, `CHANGELOG.md`, `PROGRESS.md`.
+
+Outcome: `tests/test_deck.py` passed. The generated table matches the talk figures: one answer S 3,775 → 591 ms, M 4,104 → 1,026 ms, L 4,222 → 1,041 ms; plant M tools 51 → 37, 1,003 → 336, 2,941 → 532, 109 → 122 ms; stop suggestions 85.4%, 98.0%, 67.2%.
