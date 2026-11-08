@@ -145,6 +145,14 @@ Outcome: explained, no tool change. Everything ran on battery: the laptop was on
 - A single-thread loop runs 1.9× slower on an E-core than on a P-core. Unpinned runs landed on either kind: the oneDAL answer was 1,288 ms in one probe and 817 ms in the next.
 - `pytest -q`: 28 passed (the uncommitted MCP test skipped). No change under `tools/`, so no parity run was needed.
 
+## 2.1 MCP server (optional)
+
+Plan: a stdio server on the `mcp` v2 low-level `Server`. Tools and input schemas come from `tools/schemas.json`, with the shared `scope` definition inlined because MCP input schemas must stand alone. Calls run in a worker thread and return `tools.public(envelope)`. Keep `mcp` an optional extra and test with an in-process client.
+
+Files: `agent/__init__.py`, `agent/mcp_server.py`, `tests/test_mcp_server.py`, `pyproject.toml` (`mcp` extra, `agent` package), `README.md`, `CLAUDE.md`, `CHANGELOG.md`, `PROGRESS.md`.
+
+Outcome: done. `mcp` 2.3.0 was installed into a scratch directory, not the project `.venv`, so the optional dependency stays optional there. With it on the path, `tests/test_mcp_server.py`: 2 passed. The in-process client lists the four tools, and each call matches a direct `tools.public` call on call id, facts and parity status. Unknown arguments return a tool error. A stdio smoke run, with the server as a subprocess on plant S seed 3, listed the four tools and returned a citable `signal_health` envelope. Without `mcp`, `pytest -q`: 28 passed, 1 skipped. No change under `tools/`.
+
 ## Decisions needed
 
 1. **Null drivers: grouped holdout?** The shadow rule did not help because operator and weekday beat their shuffled copies in most runs. My guess, not tested: the holdout is a random split of hours, so hours from the same line, shift and day sit on both sides. Operator is drawn per line, shift and day, and weekday also marks days, so both can stand in for day-level effects such as the supplier drawn per machine and day. A holdout split by day would test this. It changes the tool's method and the slide numbers, so it is your call.

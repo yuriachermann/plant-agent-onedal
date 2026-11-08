@@ -14,13 +14,15 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest>=8", "ruff>=0.8", "threadpoolctl>=3"]
+# agent/mcp_server.py only; nothing else imports it
+mcp = ["mcp>=2"]
 
 [build-system]
 requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
-include = ["plantgen*", "tools*", "bench*", "demo*"]
+include = ["plantgen*", "tools*", "bench*", "demo*", "agent*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -34,7 +36,7 @@ markers = [
 [tool.ruff]
 target-version = "py311"
 line-length = 120
-src = ["plantgen", "tools", "bench", "demo", "tests"]
+src = ["plantgen", "tools", "bench", "demo", "agent", "tests"]
 
 [tool.ruff.lint]
 # Explicit set so `ruff check` does not follow ruff's growing default list.
@@ -45,4 +47,4 @@ select = ["E", "F", "I", "UP", "B"]
 ignore = ["E501", "E731", "E741", "B007", "B023", "B905"]
 
 [tool.ruff.lint.isort]
-known-first-party = ["plantgen", "tools", "bench", "demo"]
+known-first-party = ["plantgen", "tools", "bench", "demo", "agent"]

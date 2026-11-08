@@ -67,6 +67,20 @@ result `citable: false`.
 | `rank_loss_drivers` | What goes with unplanned stops? | Random forest on machine-hours + permutation importance on held-out hours | `RandomForestRegressor` (fit and predict) |
 | `signal_health` | Is any machine behaving abnormally? | PCA per machine x program, SPE and Hotelling T² | `PCA` (from 8k rows) |
 
+### Over MCP
+
+`agent/mcp_server.py` serves the same four tools over stdio with the official `mcp` SDK (v2). The
+input schemas come from `tools/schemas.json`, and every call returns `tools.public(envelope)`, so
+an MCP client gets the same call ids, parity status and facts. `mcp` is optional:
+
+```bash
+pip install -e ".[mcp]"
+python -m agent.mcp_server --backend onedal                  # synthetic plant M, seed 7
+python -m agent.mcp_server --plant-dir data/plant-M          # or a real export
+```
+
+`tests/test_mcp_server.py` drives it with an in-process client and is skipped when `mcp` is not installed.
+
 ## What changed for oneDAL, and what didn't
 
 | Change | Why |
