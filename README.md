@@ -63,7 +63,7 @@ result `citable: false`.
 | Tool | Question it answers | Method | oneDAL estimators |
 |---|---|---|---|
 | `cluster_stops` | Where did the time go? Which stops have no reason? | k-means families with a suggested reason; DBSCAN for irregular stops | `KMeans`, `DBSCAN` (brute force up to 30k stops) |
-| `detect_cycle_drift` | Is anything getting slower? | kNN novelty score per machine x program, last 7 days vs the 21 before | `NearestNeighbors` |
+| `detect_cycle_drift` | Is anything getting slower? | kNN novelty score per machine x program, last 7 days vs the 21 before, plus a CUSUM step test on each machine's daily median cycle time | `NearestNeighbors` |
 | `rank_loss_drivers` | What goes with unplanned stops? | Random forest on machine-hours + permutation importance on held-out hours | `RandomForestRegressor` (fit and predict) |
 | `signal_health` | Is any machine behaving abnormally? | PCA per machine x program, SPE and Hotelling T² | `PCA` (from 8k rows) |
 
@@ -120,8 +120,10 @@ file; `load_plant` builds the hour table from stops, cycles and machines when `h
 `python -m bench.evaluate` scores the tools against `plant.truth` on seeds 1–10 and sizes S and M.
 The numbers below are from `results/eval/summary.json` (stock scikit-learn, 20 plants).
 
-* **Drift** (wear and step together). On the 19 plants that flagged a machine, precision is 100%.
-  Mean recall is 53.3% (45.0% on S, 61.7% on M). One size-S plant flagged nobody.
+* **Drift** (wear and step together). Precision is 100% on all 20 plants, and no healthy machine is
+  flagged. Mean recall is 98.3% (100% on S, 96.7% on M): wear 97.5%, step 100%. The kNN envelope
+  alone reaches 53.3% and catches 22.5% of the step faults (`results/eval/drift-envelope-only/summary.json`);
+  the per-machine CUSUM step test finds the rest.
 * **Signal health.** Coolant recall averages 90% (100% on M, and 0 on two size-S plants). No healthy
   machine was flagged. Healthy means no wear, step, or coolant fault.
 * **Drivers.** On average 71.2% of the planted drivers land in the top 3: tool age in every run,
@@ -135,7 +137,7 @@ The numbers below are from `results/eval/summary.json` (stock scikit-learn, 20 p
   (`runs` where `size` is M and `seed` is 7).
 
 `pytest -m slow` reruns the same grid and checks floors 0.10 below those means. The healthy-machine
-false-positive ceiling is the measured maximum, 0, plus 0.05.
+false-positive ceilings (signal health and drift) are the measured maximum, 0, plus 0.05.
 
 ## Reference results
 

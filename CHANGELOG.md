@@ -23,3 +23,14 @@
   | Planted drivers reported | 80.0% | 90.0% |
 
   Sources: `results/eval/summary.json` and `results/eval/drivers-shadow/summary.json`.
+- Drift recall (tool version 0.4.0): `detect_cycle_drift` adds a per-machine step test beside the kNN envelope. Each cycle time is divided by its program's reference median, and a one-sided CUSUM (slack 0.5σ, alarm at 5σ, σ from the 21 reference days) runs on the machine's daily median. It fires when the CUSUM alarms and the median since the alarm is at least 2% above the reference. A machine is flagged when either test fires; `step_test=False` turns it off. Flagged items carry `flagged_by` and `step`, and the fact gives the step change and dates. Seeds 1–10, sizes S and M, stock:
+
+  | | Envelope only | Envelope + step test |
+  |---|---:|---:|
+  | Recall, mean (S / M) | 53.3% (45.0% / 61.7%) | 98.3% (100% / 96.7%) |
+  | Recall, wear / step | 80.0% / 22.5% | 97.5% / 100% |
+  | Recall, lowest plant | 0% | 66.7% |
+  | Precision, mean and min | 100% (19 plants flagged) | 100% (20 plants flagged) |
+  | Healthy machines flagged | 0% | 0% |
+
+  No plant lost recall or precision. Sources: `results/eval/drift-envelope-only/summary.json` and `results/eval/summary.json`. `bench.evaluate` now reports drift recall per fault type and healthy-machine false positives, and `--drift-step-test off` reproduces the envelope-only grid. The slow test's drift recall floor moves up to 0.9833 − 0.10, and it gains a drift healthy-machine ceiling of 0.05.

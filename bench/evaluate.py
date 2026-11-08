@@ -4,9 +4,10 @@ The generator's ``truth`` is the only answer key. This module does not change
 the tools or the plant. It runs each tool once per seed and size and writes
 the rates below.
 
-* Drift: precision and recall for wear and step faults together. A flagged
-  machine that is not in that set, including a coolant fault, counts as a
-  false positive.
+* Drift: precision and recall for wear and step faults together, recall per
+  fault type, and the share of healthy machines flagged. A flagged machine
+  that is not in the wear or step set, including a coolant fault, counts as a
+  false positive. ``--drift-step-test off`` scores the envelope test alone.
 * Signal health: recall on coolant faults, and the share of healthy machines
   that are flagged. Healthy means no wear, step, or coolant fault.
 * Drivers: how often each planted driver is in the top 3 by importance, how
@@ -20,6 +21,7 @@ the rates below.
     python -m bench.evaluate
     python -m bench.evaluate --seeds 1 --sizes S --out results/_eval_smoke
     python -m bench.evaluate --drivers-rule shadow --out results/eval/drivers-shadow
+    python -m bench.evaluate --drift-step-test off --out results/eval/drift-envelope-only
 """
 from __future__ import annotations
 
@@ -45,7 +47,9 @@ def _rate(num: int, den: int) -> float | None:
 
 
 def _drift(plant, env) -> dict:
-    planted = set(plant.truth["drift_wear"]) | set(plant.truth["drift_step"])
+    wear, step = set(plant.truth["drift_wear"]), set(plant.truth["drift_step"])
+    planted = wear | step
+    healthy = set(plant.machines["machine_id"]) - planted - set(plant.truth["coolant_fault"])
     flagged = {f["machine_id"] for f in env["result"]["flagged"]}
     tp = len(flagged & planted)
     return {
@@ -53,7 +57,12 @@ def _drift(plant, env) -> dict:
         "flagged": sorted(flagged),
         "precision": _rate(tp, len(flagged)),
         "recall": _rate(tp, len(planted)),
+        "wear_recall": _rate(len(flagged & wear), len(wear)),
+        "step_recall": _rate(len(flagged & step), len(step)),
+        "healthy_false_positives": sorted(flagged & healthy),
+        "healthy_false_positive_rate": _rate(len(flagged & healthy), len(healthy)),
         "coolant_also_flagged": sorted(flagged & set(plant.truth["coolant_fault"])),
+        "flagged_by": {f["machine_id"]: f.get("flagged_by", ["envelope"]) for f in env["result"]["flagged"]},
     }
 
 
@@ -108,9 +117,9 @@ def _stops(plant, env) -> dict:
     }
 
 
-def score_plant(plant, backend: str = "stock", drivers_rule: str | None = None) -> dict:
+def score_plant(plant, backend: str = "stock", drivers_rule: str | None = None, drift_step_test: bool = True) -> dict:
     set_backend(backend)
-    drift = _drift(plant, TOOLS["detect_cycle_drift"](plant, None))
+    drift = _drift(plant, TOOLS["detect_cycle_drift"](plant, None, step_test=drift_step_test))
     health = _health(plant, TOOLS["signal_health"](plant, None))
     dparams = {"null_rule": drivers_rule} if drivers_rule else {}
     drivers = _drivers(plant, TOOLS["rank_loss_drivers"](plant, None, **dparams))
@@ -169,6 +178,10 @@ def aggregate(runs: list[dict]) -> dict:
             "precision_min": _round(_min(col(("drift", "precision")))),
             "recall_mean": _round(_mean(col(("drift", "recall")))),
             "recall_min": _round(_min(col(("drift", "recall")))),
+            "wear_recall_mean": _round(_mean(col(("drift", "wear_recall")))),
+            "step_recall_mean": _round(_mean(col(("drift", "step_recall")))),
+            "healthy_false_positive_rate_mean": _round(_mean(col(("drift", "healthy_false_positive_rate")))),
+            "healthy_false_positive_rate_max": _round(_max(col(("drift", "healthy_false_positive_rate")))),
         },
         "signal_health": {
             "coolant_recall_mean": _round(_mean(col(("signal_health", "coolant_recall")))),
@@ -216,7 +229,11 @@ def render_md(summary: dict) -> str:
         "",
         f"Precision mean {_pct(agg['drift']['precision_mean'])} (min {_pct(agg['drift']['precision_min'])}) "
         f"on the {flagged_plants} plants that flagged at least one machine. "
-        f"Recall mean {_pct(agg['drift']['recall_mean'])} (min {_pct(agg['drift']['recall_min'])}).",
+        f"Recall mean {_pct(agg['drift']['recall_mean'])} (min {_pct(agg['drift']['recall_min'])}): "
+        f"wear {_pct(agg['drift']['wear_recall_mean'])}, step {_pct(agg['drift']['step_recall_mean'])}. "
+        f"Healthy-machine false-positive rate mean {_pct(agg['drift']['healthy_false_positive_rate_mean'])} "
+        f"(max {_pct(agg['drift']['healthy_false_positive_rate_max'])}). "
+        f"Step test {'on' if summary.get('drift_step_test', True) else 'off'}.",
         "",
         "## Signal health",
         "",
@@ -271,12 +288,13 @@ def render_md(summary: dict) -> str:
     return "\n".join(lines)
 
 
-def run(seeds: list[int], sizes: list[str], backend: str, out: Path, drivers_rule: str | None = None) -> dict:
+def run(seeds: list[int], sizes: list[str], backend: str, out: Path, drivers_rule: str | None = None,
+        drift_step_test: bool = True) -> dict:
     runs = []
     for size in sizes:
         for seed in seeds:
             plant = generate_plant(size, seed=seed)
-            scored = score_plant(plant, backend, drivers_rule)
+            scored = score_plant(plant, backend, drivers_rule, drift_step_test)
             runs.append({"size": size, "seed": seed, "plant_id": plant.plant_id, **scored})
             d, h, s = scored["drift"], scored["signal_health"], scored["stops"]
             print(
@@ -290,6 +308,7 @@ def run(seeds: list[int], sizes: list[str], backend: str, out: Path, drivers_rul
         "seeds": seeds,
         "sizes": sizes,
         "drivers_rule": runs[0]["drivers"]["rule"] if runs else drivers_rule,
+        "drift_step_test": drift_step_test,
         "definitions": {
             "drift_positive": "drift_wear ∪ drift_step. Other flagged machines, including coolant faults, are false positives.",
             "signal_health_healthy": "Machines with no wear, step, or coolant fault.",
@@ -316,10 +335,10 @@ def _public_runs(runs: list[dict]) -> list[dict]:
     for run in runs:
         item = {"size": run["size"], "seed": run["seed"], "plant_id": run["plant_id"], "drift": {}, "signal_health": {},
                 "drivers": run["drivers"], "stops": {}}
-        for key in ("precision", "recall"):
+        for key in ("precision", "recall", "wear_recall", "step_recall", "healthy_false_positive_rate"):
             item["drift"][key] = _round(run["drift"][key])
-        item["drift"]["flagged"] = run["drift"]["flagged"]
-        item["drift"]["coolant_also_flagged"] = run["drift"]["coolant_also_flagged"]
+        for key in ("planted", "flagged", "healthy_false_positives", "coolant_also_flagged", "flagged_by"):
+            item["drift"][key] = run["drift"][key]
         item["signal_health"] = {
             "coolant_recall": _round(run["signal_health"]["coolant_recall"]),
             "healthy_false_positives": run["signal_health"]["healthy_false_positives"],
@@ -338,9 +357,11 @@ def main(argv=None):
     ap.add_argument("--backend", choices=["stock", "onedal"], default="stock")
     ap.add_argument("--drivers-rule", choices=list(NULL_RULES), default=None,
                     help="rank_loss_drivers reporting rule; default is the tool's own default")
+    ap.add_argument("--drift-step-test", choices=["on", "off"], default="on",
+                    help="detect_cycle_drift step test; off scores the kNN envelope alone")
     ap.add_argument("--out", default=str(REPO / "results" / "eval"))
     args = ap.parse_args(argv)
-    run(args.seeds, args.sizes, args.backend, Path(args.out), args.drivers_rule)
+    run(args.seeds, args.sizes, args.backend, Path(args.out), args.drivers_rule, args.drift_step_test == "on")
     return 0
 
 

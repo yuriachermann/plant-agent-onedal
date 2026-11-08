@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-11-08T03:24:22+00:00",
+  "checked_at": "2026-11-08T11:54:50+00:00",
   "plant": {
     "plant_id": "plant-40m-s7",
     "machines": 40,
@@ -16,7 +16,7 @@
     "sklearnex": "2026.2.0",
     "onedal": "2026.2.0"
   },
-  "tool_version": "0.3.0",
+  "tool_version": "0.4.0",
   "tolerances": {
     "cluster_stops": {
       "family_ari_min": 0.99,
@@ -39,10 +39,10 @@
   "tools": {
     "cluster_stops": {
       "pass": true,
-      "tool_version": "0.3.0",
+      "tool_version": "0.4.0",
       "sklearn": "1.9.1",
       "sklearnex": "2026.2.0",
-      "checked_at": "2026-11-08T03:24:22+00:00",
+      "checked_at": "2026-11-08T11:54:50+00:00",
       "scopes": {
         "plant": {
           "pass": true,
@@ -78,24 +78,28 @@
     },
     "detect_cycle_drift": {
       "pass": true,
-      "tool_version": "0.3.0",
+      "tool_version": "0.4.0",
       "sklearn": "1.9.1",
       "sklearnex": "2026.2.0",
-      "checked_at": "2026-11-08T03:24:22+00:00",
+      "checked_at": "2026-11-08T11:54:50+00:00",
       "scopes": {
         "plant": {
           "pass": true,
           "flagged_stock": [
             "M003",
             "M006",
+            "M018",
             "M022",
-            "M028"
+            "M028",
+            "M040"
           ],
           "flagged_onedal": [
             "M003",
             "M006",
+            "M018",
             "M022",
-            "M028"
+            "M028",
+            "M040"
           ],
           "max_share_abs_diff": 0.0,
           "compared_units": 121,
@@ -133,10 +137,10 @@
     },
     "rank_loss_drivers": {
       "pass": true,
-      "tool_version": "0.3.0",
+      "tool_version": "0.4.0",
       "sklearn": "1.9.1",
       "sklearnex": "2026.2.0",
-      "checked_at": "2026-11-08T03:24:22+00:00",
+      "checked_at": "2026-11-08T11:54:50+00:00",
       "scopes": {
         "plant": {
           "pass": true,
@@ -198,10 +202,10 @@
     },
     "signal_health": {
       "pass": true,
-      "tool_version": "0.3.0",
+      "tool_version": "0.4.0",
       "sklearn": "1.9.1",
       "sklearnex": "2026.2.0",
-      "checked_at": "2026-11-08T03:24:22+00:00",
+      "checked_at": "2026-11-08T11:54:50+00:00",
       "scopes": {
         "plant": {
           "pass": true,

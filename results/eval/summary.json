@@ -17,6 +17,7 @@
     "M"
   ],
   "drivers_rule": "sigma",
+  "drift_step_test": true,
   "definitions": {
     "drift_positive": "drift_wear \u222a drift_step. Other flagged machines, including coolant faults, are false positives.",
     "signal_health_healthy": "Machines with no wear, step, or coolant fault.",
@@ -33,11 +34,29 @@
       "plant_id": "plant-12m-s1",
       "drift": {
         "precision": 1.0,
-        "recall": 0.5,
-        "flagged": [
+        "recall": 1.0,
+        "wear_recall": 1.0,
+        "step_recall": 1.0,
+        "healthy_false_positive_rate": 0.0,
+        "planted": [
+          "M007",
           "M011"
         ],
-        "coolant_also_flagged": []
+        "flagged": [
+          "M007",
+          "M011"
+        ],
+        "healthy_false_positives": [],
+        "coolant_also_flagged": [],
+        "flagged_by": {
+          "M011": [
+            "envelope",
+            "step"
+          ],
+          "M007": [
+            "step"
+          ]
+        }
       },
       "signal_health": {
         "coolant_recall": 1.0,
@@ -94,11 +113,29 @@
       "plant_id": "plant-12m-s2",
       "drift": {
         "precision": 1.0,
-        "recall": 0.5,
-        "flagged": [
-          "M003"
+        "recall": 1.0,
+        "wear_recall": 1.0,
+        "step_recall": 1.0,
+        "healthy_false_positive_rate": 0.0,
+        "planted": [
+          "M003",
+          "M004"
         ],
-        "coolant_also_flagged": []
+        "flagged": [
+          "M003",
+          "M004"
+        ],
+        "healthy_false_positives": [],
+        "coolant_also_flagged": [],
+        "flagged_by": {
+          "M003": [
+            "envelope",
+            "step"
+          ],
+          "M004": [
+            "step"
+          ]
+        }
       },
       "signal_health": {
         "coolant_recall": 1.0,
@@ -152,11 +189,29 @@
       "plant_id": "plant-12m-s3",
       "drift": {
         "precision": 1.0,
-        "recall": 0.5,
-        "flagged": [
+        "recall": 1.0,
+        "wear_recall": 1.0,
+        "step_recall": 1.0,
+        "healthy_false_positive_rate": 0.0,
+        "planted": [
+          "M003",
           "M005"
         ],
-        "coolant_also_flagged": []
+        "flagged": [
+          "M003",
+          "M005"
+        ],
+        "healthy_false_positives": [],
+        "coolant_also_flagged": [],
+        "flagged_by": {
+          "M005": [
+            "envelope",
+            "step"
+          ],
+          "M003": [
+            "step"
+          ]
+        }
       },
       "signal_health": {
         "coolant_recall": 1.0,
@@ -212,10 +267,29 @@
       "seed": 4,
       "plant_id": "plant-12m-s4",
       "drift": {
-        "precision": null,
-        "recall": 0.0,
-        "flagged": [],
-        "coolant_also_flagged": []
+        "precision": 1.0,
+        "recall": 1.0,
+        "wear_recall": 1.0,
+        "step_recall": 1.0,
+        "healthy_false_positive_rate": 0.0,
+        "planted": [
+          "M005",
+          "M009"
+        ],
+        "flagged": [
+          "M005",
+          "M009"
+        ],
+        "healthy_false_positives": [],
+        "coolant_also_flagged": [],
+        "flagged_by": {
+          "M005": [
+            "step"
+          ],
+          "M009": [
+            "step"
+          ]
+        }
       },
       "signal_health": {
         "coolant_recall": 1.0,
@@ -267,11 +341,29 @@
       "plant_id": "plant-12m-s5",
       "drift": {
         "precision": 1.0,
-        "recall": 0.5,
-        "flagged": [
-          "M004"
+        "recall": 1.0,
+        "wear_recall": 1.0,
+        "step_recall": 1.0,
+        "healthy_false_positive_rate": 0.0,
+        "planted": [
+          "M004",
+          "M005"
         ],
-        "coolant_also_flagged": []
+        "flagged": [
+          "M004",
+          "M005"
+        ],
+        "healthy_false_positives": [],
+        "coolant_also_flagged": [],
+        "flagged_by": {
+          "M004": [
+            "envelope",
+            "step"
+          ],
+          "M005": [
+            "step"
+          ]
+        }
       },
       "signal_health": {
         "coolant_recall": 0.0,
@@ -328,11 +420,28 @@
       "plant_id": "plant-12m-s6",
       "drift": {
         "precision": 1.0,
-        "recall": 0.5,
-        "flagged": [
-          "M008"
+        "recall": 1.0,
+        "wear_recall": 1.0,
+        "step_recall": 1.0,
+        "healthy_false_positive_rate": 0.0,
+        "planted": [
+          "M008",
+          "M011"
         ],
-        "coolant_also_flagged": []
+        "flagged": [
+          "M008",
+          "M011"
+        ],
+        "healthy_false_positives": [],
+        "coolant_also_flagged": [],
+        "flagged_by": {
+          "M008": [
+            "envelope"
+          ],
+          "M011": [
+            "step"
+          ]
+        }
       },
       "signal_health": {
         "coolant_recall": 1.0,
@@ -386,11 +495,29 @@
       "plant_id": "plant-12m-s7",
       "drift": {
         "precision": 1.0,
-        "recall": 0.5,
-        "flagged": [
-          "M002"
+        "recall": 1.0,
+        "wear_recall": 1.0,
+        "step_recall": 1.0,
+        "healthy_false_positive_rate": 0.0,
+        "planted": [
+          "M002",
+          "M005"
         ],
-        "coolant_also_flagged": []
+        "flagged": [
+          "M002",
+          "M005"
+        ],
+        "healthy_false_positives": [],
+        "coolant_also_flagged": [],
+        "flagged_by": {
+          "M002": [
+            "envelope",
+            "step"
+          ],
+          "M005": [
+            "step"
+          ]
+        }
       },
       "signal_health": {
         "coolant_recall": 1.0,
@@ -445,11 +572,29 @@
       "plant_id": "plant-12m-s8",
       "drift": {
         "precision": 1.0,
-        "recall": 0.5,
-        "flagged": [
-          "M007"
+        "recall": 1.0,
+        "wear_recall": 1.0,
+        "step_recall": 1.0,
+        "healthy_false_positive_rate": 0.0,
+        "planted": [
+          "M007",
+          "M011"
         ],
-        "coolant_also_flagged": []
+        "flagged": [
+          "M007",
+          "M011"
+        ],
+        "healthy_false_positives": [],
+        "coolant_also_flagged": [],
+        "flagged_by": {
+          "M007": [
+            "envelope",
+            "step"
+          ],
+          "M011": [
+            "step"
+          ]
+        }
       },
       "signal_health": {
         "coolant_recall": 0.0,
@@ -504,11 +649,29 @@
       "plant_id": "plant-12m-s9",
       "drift": {
         "precision": 1.0,
-        "recall": 0.5,
-        "flagged": [
+        "recall": 1.0,
+        "wear_recall": 1.0,
+        "step_recall": 1.0,
+        "healthy_false_positive_rate": 0.0,
+        "planted": [
+          "M005",
           "M012"
         ],
-        "coolant_also_flagged": []
+        "flagged": [
+          "M005",
+          "M012"
+        ],
+        "healthy_false_positives": [],
+        "coolant_also_flagged": [],
+        "flagged_by": {
+          "M012": [
+            "envelope",
+            "step"
+          ],
+          "M005": [
+            "step"
+          ]
+        }
       },
       "signal_health": {
         "coolant_recall": 1.0,
@@ -562,11 +725,29 @@
       "plant_id": "plant-12m-s10",
       "drift": {
         "precision": 1.0,
-        "recall": 0.5,
-        "flagged": [
+        "recall": 1.0,
+        "wear_recall": 1.0,
+        "step_recall": 1.0,
+        "healthy_false_positive_rate": 0.0,
+        "planted": [
+          "M003",
           "M006"
         ],
-        "coolant_also_flagged": []
+        "flagged": [
+          "M003",
+          "M006"
+        ],
+        "healthy_false_positives": [],
+        "coolant_also_flagged": [],
+        "flagged_by": {
+          "M006": [
+            "envelope",
+            "step"
+          ],
+          "M003": [
+            "step"
+          ]
+        }
       },
       "signal_health": {
         "coolant_recall": 1.0,
@@ -622,15 +803,53 @@
       "plant_id": "plant-40m-s1",
       "drift": {
         "precision": 1.0,
-        "recall": 0.8333,
+        "recall": 1.0,
+        "wear_recall": 1.0,
+        "step_recall": 1.0,
+        "healthy_false_positive_rate": 0.0,
+        "planted": [
+          "M001",
+          "M002",
+          "M008",
+          "M014",
+          "M018",
+          "M030"
+        ],
         "flagged": [
           "M001",
           "M002",
           "M008",
           "M014",
-          "M018"
+          "M018",
+          "M030"
         ],
-        "coolant_also_flagged": []
+        "healthy_false_positives": [],
+        "coolant_also_flagged": [],
+        "flagged_by": {
+          "M001": [
+            "envelope",
+            "step"
+          ],
+          "M008": [
+            "envelope",
+            "step"
+          ],
+          "M014": [
+            "envelope",
+            "step"
+          ],
+          "M018": [
+            "envelope",
+            "step"
+          ],
+          "M002": [
+            "envelope",
+            "step"
+          ],
+          "M030": [
+            "step"
+          ]
+        }
       },
       "signal_health": {
         "coolant_recall": 1.0,
@@ -687,15 +906,53 @@
       "plant_id": "plant-40m-s2",
       "drift": {
         "precision": 1.0,
-        "recall": 0.8333,
+        "recall": 1.0,
+        "wear_recall": 1.0,
+        "step_recall": 1.0,
+        "healthy_false_positive_rate": 0.0,
+        "planted": [
+          "M002",
+          "M017",
+          "M018",
+          "M021",
+          "M023",
+          "M030"
+        ],
         "flagged": [
           "M002",
           "M017",
           "M018",
           "M021",
-          "M023"
+          "M023",
+          "M030"
         ],
-        "coolant_also_flagged": []
+        "healthy_false_positives": [],
+        "coolant_also_flagged": [],
+        "flagged_by": {
+          "M002": [
+            "envelope",
+            "step"
+          ],
+          "M017": [
+            "envelope",
+            "step"
+          ],
+          "M021": [
+            "envelope",
+            "step"
+          ],
+          "M018": [
+            "envelope",
+            "step"
+          ],
+          "M023": [
+            "envelope",
+            "step"
+          ],
+          "M030": [
+            "step"
+          ]
+        }
       },
       "signal_health": {
         "coolant_recall": 1.0,
@@ -751,12 +1008,42 @@
       "plant_id": "plant-40m-s3",
       "drift": {
         "precision": 1.0,
-        "recall": 0.3333,
-        "flagged": [
+        "recall": 0.6667,
+        "wear_recall": 0.5,
+        "step_recall": 1.0,
+        "healthy_false_positive_rate": 0.0,
+        "planted": [
+          "M006",
+          "M010",
+          "M019",
           "M027",
-          "M032"
+          "M032",
+          "M033"
         ],
-        "coolant_also_flagged": []
+        "flagged": [
+          "M019",
+          "M027",
+          "M032",
+          "M033"
+        ],
+        "healthy_false_positives": [],
+        "coolant_also_flagged": [],
+        "flagged_by": {
+          "M027": [
+            "envelope",
+            "step"
+          ],
+          "M032": [
+            "envelope",
+            "step"
+          ],
+          "M033": [
+            "step"
+          ],
+          "M019": [
+            "step"
+          ]
+        }
       },
       "signal_health": {
         "coolant_recall": 1.0,
@@ -811,14 +1098,52 @@
       "plant_id": "plant-40m-s4",
       "drift": {
         "precision": 1.0,
-        "recall": 0.6667,
-        "flagged": [
+        "recall": 1.0,
+        "wear_recall": 1.0,
+        "step_recall": 1.0,
+        "healthy_false_positive_rate": 0.0,
+        "planted": [
+          "M006",
           "M022",
           "M027",
           "M030",
+          "M033",
           "M039"
         ],
-        "coolant_also_flagged": []
+        "flagged": [
+          "M006",
+          "M022",
+          "M027",
+          "M030",
+          "M033",
+          "M039"
+        ],
+        "healthy_false_positives": [],
+        "coolant_also_flagged": [],
+        "flagged_by": {
+          "M039": [
+            "envelope",
+            "step"
+          ],
+          "M027": [
+            "envelope",
+            "step"
+          ],
+          "M030": [
+            "envelope",
+            "step"
+          ],
+          "M022": [
+            "envelope",
+            "step"
+          ],
+          "M033": [
+            "step"
+          ],
+          "M006": [
+            "step"
+          ]
+        }
       },
       "signal_health": {
         "coolant_recall": 1.0,
@@ -875,14 +1200,52 @@
       "plant_id": "plant-40m-s5",
       "drift": {
         "precision": 1.0,
-        "recall": 0.6667,
+        "recall": 1.0,
+        "wear_recall": 1.0,
+        "step_recall": 1.0,
+        "healthy_false_positive_rate": 0.0,
+        "planted": [
+          "M021",
+          "M022",
+          "M023",
+          "M024",
+          "M027",
+          "M033"
+        ],
         "flagged": [
           "M021",
           "M022",
           "M023",
+          "M024",
+          "M027",
           "M033"
         ],
-        "coolant_also_flagged": []
+        "healthy_false_positives": [],
+        "coolant_also_flagged": [],
+        "flagged_by": {
+          "M023": [
+            "envelope",
+            "step"
+          ],
+          "M033": [
+            "envelope",
+            "step"
+          ],
+          "M022": [
+            "envelope",
+            "step"
+          ],
+          "M021": [
+            "envelope",
+            "step"
+          ],
+          "M027": [
+            "step"
+          ],
+          "M024": [
+            "step"
+          ]
+        }
       },
       "signal_health": {
         "coolant_recall": 1.0,
@@ -941,13 +1304,51 @@
       "plant_id": "plant-40m-s6",
       "drift": {
         "precision": 1.0,
-        "recall": 0.5,
-        "flagged": [
+        "recall": 1.0,
+        "wear_recall": 1.0,
+        "step_recall": 1.0,
+        "healthy_false_positive_rate": 0.0,
+        "planted": [
+          "M006",
           "M011",
           "M016",
+          "M025",
+          "M029",
           "M033"
         ],
-        "coolant_also_flagged": []
+        "flagged": [
+          "M006",
+          "M011",
+          "M016",
+          "M025",
+          "M029",
+          "M033"
+        ],
+        "healthy_false_positives": [],
+        "coolant_also_flagged": [],
+        "flagged_by": {
+          "M033": [
+            "envelope",
+            "step"
+          ],
+          "M016": [
+            "envelope",
+            "step"
+          ],
+          "M011": [
+            "envelope",
+            "step"
+          ],
+          "M006": [
+            "step"
+          ],
+          "M025": [
+            "step"
+          ],
+          "M029": [
+            "step"
+          ]
+        }
       },
       "signal_health": {
         "coolant_recall": 1.0,
@@ -1005,14 +1406,52 @@
       "plant_id": "plant-40m-s7",
       "drift": {
         "precision": 1.0,
-        "recall": 0.6667,
+        "recall": 1.0,
+        "wear_recall": 1.0,
+        "step_recall": 1.0,
+        "healthy_false_positive_rate": 0.0,
+        "planted": [
+          "M003",
+          "M006",
+          "M018",
+          "M022",
+          "M028",
+          "M040"
+        ],
         "flagged": [
           "M003",
           "M006",
+          "M018",
           "M022",
-          "M028"
+          "M028",
+          "M040"
         ],
-        "coolant_also_flagged": []
+        "healthy_false_positives": [],
+        "coolant_also_flagged": [],
+        "flagged_by": {
+          "M028": [
+            "envelope",
+            "step"
+          ],
+          "M006": [
+            "envelope",
+            "step"
+          ],
+          "M003": [
+            "envelope",
+            "step"
+          ],
+          "M022": [
+            "envelope",
+            "step"
+          ],
+          "M018": [
+            "step"
+          ],
+          "M040": [
+            "step"
+          ]
+        }
       },
       "signal_health": {
         "coolant_recall": 1.0,
@@ -1070,15 +1509,52 @@
       "plant_id": "plant-40m-s8",
       "drift": {
         "precision": 1.0,
-        "recall": 0.8333,
+        "recall": 1.0,
+        "wear_recall": 1.0,
+        "step_recall": 1.0,
+        "healthy_false_positive_rate": 0.0,
+        "planted": [
+          "M001",
+          "M008",
+          "M013",
+          "M015",
+          "M025",
+          "M032"
+        ],
         "flagged": [
           "M001",
           "M008",
           "M013",
+          "M015",
           "M025",
           "M032"
         ],
-        "coolant_also_flagged": []
+        "healthy_false_positives": [],
+        "coolant_also_flagged": [],
+        "flagged_by": {
+          "M032": [
+            "envelope",
+            "step"
+          ],
+          "M008": [
+            "envelope",
+            "step"
+          ],
+          "M025": [
+            "envelope",
+            "step"
+          ],
+          "M013": [
+            "envelope",
+            "step"
+          ],
+          "M001": [
+            "envelope"
+          ],
+          "M015": [
+            "step"
+          ]
+        }
       },
       "signal_health": {
         "coolant_recall": 1.0,
@@ -1135,14 +1611,52 @@
       "plant_id": "plant-40m-s9",
       "drift": {
         "precision": 1.0,
-        "recall": 0.6667,
+        "recall": 1.0,
+        "wear_recall": 1.0,
+        "step_recall": 1.0,
+        "healthy_false_positive_rate": 0.0,
+        "planted": [
+          "M014",
+          "M017",
+          "M020",
+          "M026",
+          "M027",
+          "M034"
+        ],
         "flagged": [
           "M014",
           "M017",
+          "M020",
           "M026",
+          "M027",
           "M034"
         ],
-        "coolant_also_flagged": []
+        "healthy_false_positives": [],
+        "coolant_also_flagged": [],
+        "flagged_by": {
+          "M026": [
+            "envelope",
+            "step"
+          ],
+          "M017": [
+            "envelope",
+            "step"
+          ],
+          "M014": [
+            "envelope",
+            "step"
+          ],
+          "M034": [
+            "envelope",
+            "step"
+          ],
+          "M027": [
+            "step"
+          ],
+          "M020": [
+            "step"
+          ]
+        }
       },
       "signal_health": {
         "coolant_recall": 1.0,
@@ -1203,11 +1717,49 @@
       "plant_id": "plant-40m-s10",
       "drift": {
         "precision": 1.0,
-        "recall": 0.1667,
-        "flagged": [
-          "M027"
+        "recall": 1.0,
+        "wear_recall": 1.0,
+        "step_recall": 1.0,
+        "healthy_false_positive_rate": 0.0,
+        "planted": [
+          "M021",
+          "M025",
+          "M027",
+          "M028",
+          "M034",
+          "M040"
         ],
-        "coolant_also_flagged": []
+        "flagged": [
+          "M021",
+          "M025",
+          "M027",
+          "M028",
+          "M034",
+          "M040"
+        ],
+        "healthy_false_positives": [],
+        "coolant_also_flagged": [],
+        "flagged_by": {
+          "M027": [
+            "envelope",
+            "step"
+          ],
+          "M025": [
+            "step"
+          ],
+          "M040": [
+            "step"
+          ],
+          "M028": [
+            "step"
+          ],
+          "M021": [
+            "step"
+          ],
+          "M034": [
+            "step"
+          ]
+        }
       },
       "signal_health": {
         "coolant_recall": 1.0,
@@ -1261,8 +1813,12 @@
     "drift": {
       "precision_mean": 1.0,
       "precision_min": 1.0,
-      "recall_mean": 0.5333,
-      "recall_min": 0.0
+      "recall_mean": 0.9833,
+      "recall_min": 0.6667,
+      "wear_recall_mean": 0.975,
+      "step_recall_mean": 1.0,
+      "healthy_false_positive_rate_mean": 0.0,
+      "healthy_false_positive_rate_max": 0.0
     },
     "signal_health": {
       "coolant_recall_mean": 0.9,
@@ -1343,8 +1899,12 @@
       "drift": {
         "precision_mean": 1.0,
         "precision_min": 1.0,
-        "recall_mean": 0.45,
-        "recall_min": 0.0
+        "recall_mean": 1.0,
+        "recall_min": 1.0,
+        "wear_recall_mean": 1.0,
+        "step_recall_mean": 1.0,
+        "healthy_false_positive_rate_mean": 0.0,
+        "healthy_false_positive_rate_max": 0.0
       },
       "signal_health": {
         "coolant_recall_mean": 0.8,
@@ -1424,8 +1984,12 @@
       "drift": {
         "precision_mean": 1.0,
         "precision_min": 1.0,
-        "recall_mean": 0.6167,
-        "recall_min": 0.1667
+        "recall_mean": 0.9667,
+        "recall_min": 0.6667,
+        "wear_recall_mean": 0.95,
+        "step_recall_mean": 1.0,
+        "healthy_false_positive_rate_mean": 0.0,
+        "healthy_false_positive_rate_max": 0.0
       },
       "signal_health": {
         "coolant_recall_mean": 1.0,

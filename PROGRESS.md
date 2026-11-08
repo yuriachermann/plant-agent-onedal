@@ -116,6 +116,23 @@ Outcome: shadow rule rejected. The default is still the 2σ / 20% rule.
 - Drift, signal health and stop results are identical between the two runs.
 - `python -m bench.parity` (tool version 0.3.0): PASS, same metrics as the baseline. The gate runs the default rule only. `pytest -q`: 26 passed, 1 deselected, in 36.71s.
 
+## 1.3 Drift recall
+
+Plan: add a per-machine step test beside the kNN score. Divide each cycle time by its program's reference median, take the machine's daily median, and run a one-sided CUSUM over the 7 test days in units of the reference days' standard deviation. Use the textbook slack 0.5σ and alarm 5σ, require the median since the alarm to be at least 2% above the reference, and skip days with fewer than 20 cycles. Flag a machine when either test fires. Merge only if recall rises across seeds and neither precision nor healthy-machine false positives get worse. Add per-type recall and drift healthy-machine false positives to `bench.evaluate`, and a switch that reruns the envelope alone as the baseline.
+
+Files: `tools/drift.py`, `tools/common.py` (tool version 0.4.0), `tools/schemas.json`, `bench/evaluate.py`, `tests/test_tools.py`, `tests/test_evaluate.py`, `results/eval/` (rerun), `results/eval/drift-envelope-only/`, `results/parity.json`, `results/parity_report.md`, `README.md`, `CHANGELOG.md`, `PROGRESS.md`.
+
+Outcome: merged.
+
+- Envelope only, `results/eval/drift-envelope-only/summary.json`: same flagged machines, precision and recall per run as the committed 0.3.0 grid. Recall 53.3% (S 45.0%, M 61.7%), wear 80.0%, step 22.5%. Precision 100% on the 19 plants that flagged anyone. Healthy machines flagged 0%.
+- Envelope + step test, `results/eval/summary.json`: recall 98.3% (S 100%, M 96.7%), wear 97.5%, step 100%, lowest plant 66.7% (M seed 3). Precision 100% on all 20 plants. Healthy machines flagged 0%. No coolant-fault machine flagged. Recall rose or stayed equal on every seed and size, and precision did not fall on any. Signal health, drivers and stops are unchanged.
+- 78 of the 80 planted faults are flagged. The step test is the only detector for 32 of those 78 (`flagged_by` is `["step"]` in `results/eval/summary.json`).
+- `tests/test_evaluate.py`: drift recall floor 0.9833 − 0.10 and a new drift healthy-machine ceiling of 0.05. I checked both assertions against `results/eval/summary.json` (the grid is deterministic). `pytest -m slow` itself was not rerun, because the laptop was on battery.
+- `python -m bench.parity` (tool version 0.4.0): PASS. Drift now flags M003, M006, M018, M022, M028 and M040 on plant M seed 7 with both backends (max share difference 0.0). The other tools have the same metrics as before. `pytest -q`: 27 passed. `python -m demo.agent_demo --size M --backend onedal --line L1`: citation check passed with the new step-test sentences.
+- During this task the laptop went from AC to battery. That changes timings only; the evaluation is deterministic.
+
 ## Decisions needed
 
 1. **Null drivers: grouped holdout?** The shadow rule did not help because operator and weekday beat their shuffled copies in most runs. My guess, not tested: the holdout is a random split of hours, so hours from the same line, shift and day sit on both sides. Operator is drawn per line, shift and day, and weekday also marks days, so both can stand in for day-level effects such as the supplier drawn per machine and day. A holdout split by day would test this. It changes the tool's method and the slide numbers, so it is your call.
+2. **Re-run the Xeon reference before the talk?** `results/intel-xeon-2t/` was measured with tool version 0.2.0. Version 0.4.0 adds the drift step test (more post-processing per call), and the slide plant (M seed 7) now reports 6 drifting machines instead of 4. The deck's timing table and any drift screenshot should come from a fresh `python -m bench.run_bench` on the Xeon.
+3. **`main` is not fast-forwarded past the null-driver commit.** The main checkout has an uncommitted edit to `results/parity_report.md` (the `·` separators re-encoded and a blank line added before the JSON fence, which looks like an editor saving it). The parity runs in this session rewrite that file, so `git merge --ff-only` refuses. I did not touch your working copy. To bring `main` up to this branch: `git -C <main checkout> checkout -- results/parity_report.md`, then `git -C <main checkout> merge --ff-only claude/plant-agent-onedal-devsummit-354b94`.

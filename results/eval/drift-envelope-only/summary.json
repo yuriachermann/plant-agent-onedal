@@ -1,0 +1,1894 @@
+{
+  "backend": "stock",
+  "seeds": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "sizes": [
+    "S",
+    "M"
+  ],
+  "drivers_rule": "sigma",
+  "drift_step_test": false,
+  "definitions": {
+    "drift_positive": "drift_wear \u222a drift_step. Other flagged machines, including coolant faults, are false positives.",
+    "signal_health_healthy": "Machines with no wear, step, or coolant fault.",
+    "drivers_top3": "First three rows of ranking, ordered by permutation importance.",
+    "drivers_reported": "ranking[].reported, the tool's own rule (drivers_rule).",
+    "stops_unjustified": "reason_reported is blank.",
+    "stops_accuracy": "suggested reason equals reason_true, among unjustified stops that got a suggestion.",
+    "stops_minutes": "Weighted by duration_s."
+  },
+  "runs": [
+    {
+      "size": "S",
+      "seed": 1,
+      "plant_id": "plant-12m-s1",
+      "drift": {
+        "precision": 1.0,
+        "recall": 0.5,
+        "wear_recall": 1.0,
+        "step_recall": 0.0,
+        "healthy_false_positive_rate": 0.0,
+        "planted": [
+          "M007",
+          "M011"
+        ],
+        "flagged": [
+          "M011"
+        ],
+        "healthy_false_positives": [],
+        "coolant_also_flagged": [],
+        "flagged_by": {
+          "M011": [
+            "envelope"
+          ]
+        }
+      },
+      "signal_health": {
+        "coolant_recall": 1.0,
+        "healthy_false_positives": [],
+        "healthy_false_positive_rate": 0.0,
+        "flagged_other_faults": [
+          "M011"
+        ]
+      },
+      "drivers": {
+        "top3": [
+          "tool_age",
+          "days_since_pm",
+          "supplier"
+        ],
+        "reported": [
+          "tool_age",
+          "days_since_pm",
+          "supplier",
+          "hour_of_day",
+          "line_id",
+          "machine_type"
+        ],
+        "planted_in_top3": {
+          "supplier": true,
+          "days_since_pm": true,
+          "shift": false,
+          "tool_age": true
+        },
+        "planted_reported": {
+          "supplier": true,
+          "days_since_pm": true,
+          "shift": false,
+          "tool_age": true
+        },
+        "null_reported": {
+          "operator_id": false,
+          "coolant_conc": false,
+          "weekday": false
+        },
+        "rule": "sigma"
+      },
+      "stops": {
+        "unjustified_stops": 7350,
+        "coverage_count": 0.8623,
+        "accuracy_count": 0.9744,
+        "coverage_minutes": 0.6499,
+        "accuracy_minutes": 0.5911
+      }
+    },
+    {
+      "size": "S",
+      "seed": 2,
+      "plant_id": "plant-12m-s2",
+      "drift": {
+        "precision": 1.0,
+        "recall": 0.5,
+        "wear_recall": 1.0,
+        "step_recall": 0.0,
+        "healthy_false_positive_rate": 0.0,
+        "planted": [
+          "M003",
+          "M004"
+        ],
+        "flagged": [
+          "M003"
+        ],
+        "healthy_false_positives": [],
+        "coolant_also_flagged": [],
+        "flagged_by": {
+          "M003": [
+            "envelope"
+          ]
+        }
+      },
+      "signal_health": {
+        "coolant_recall": 1.0,
+        "healthy_false_positives": [],
+        "healthy_false_positive_rate": 0.0,
+        "flagged_other_faults": [
+          "M003"
+        ]
+      },
+      "drivers": {
+        "top3": [
+          "supplier",
+          "tool_age",
+          "days_since_pm"
+        ],
+        "reported": [
+          "supplier",
+          "tool_age",
+          "days_since_pm"
+        ],
+        "planted_in_top3": {
+          "supplier": true,
+          "days_since_pm": true,
+          "shift": false,
+          "tool_age": true
+        },
+        "planted_reported": {
+          "supplier": true,
+          "days_since_pm": true,
+          "shift": false,
+          "tool_age": true
+        },
+        "null_reported": {
+          "operator_id": false,
+          "coolant_conc": false,
+          "weekday": false
+        },
+        "rule": "sigma"
+      },
+      "stops": {
+        "unjustified_stops": 7538,
+        "coverage_count": 0.872,
+        "accuracy_count": 0.9772,
+        "coverage_minutes": 0.5351,
+        "accuracy_minutes": 0.783
+      }
+    },
+    {
+      "size": "S",
+      "seed": 3,
+      "plant_id": "plant-12m-s3",
+      "drift": {
+        "precision": 1.0,
+        "recall": 0.5,
+        "wear_recall": 1.0,
+        "step_recall": 0.0,
+        "healthy_false_positive_rate": 0.0,
+        "planted": [
+          "M003",
+          "M005"
+        ],
+        "flagged": [
+          "M005"
+        ],
+        "healthy_false_positives": [],
+        "coolant_also_flagged": [],
+        "flagged_by": {
+          "M005": [
+            "envelope"
+          ]
+        }
+      },
+      "signal_health": {
+        "coolant_recall": 1.0,
+        "healthy_false_positives": [],
+        "healthy_false_positive_rate": 0.0,
+        "flagged_other_faults": [
+          "M005"
+        ]
+      },
+      "drivers": {
+        "top3": [
+          "tool_age",
+          "days_since_pm",
+          "weekday"
+        ],
+        "reported": [
+          "tool_age",
+          "days_since_pm",
+          "weekday",
+          "operator_id",
+          "supplier",
+          "machine_type"
+        ],
+        "planted_in_top3": {
+          "supplier": false,
+          "days_since_pm": true,
+          "shift": false,
+          "tool_age": true
+        },
+        "planted_reported": {
+          "supplier": true,
+          "days_since_pm": true,
+          "shift": false,
+          "tool_age": true
+        },
+        "null_reported": {
+          "operator_id": true,
+          "coolant_conc": false,
+          "weekday": true
+        },
+        "rule": "sigma"
+      },
+      "stops": {
+        "unjustified_stops": 7418,
+        "coverage_count": 0.8993,
+        "accuracy_count": 0.9415,
+        "coverage_minutes": 0.7568,
+        "accuracy_minutes": 0.5183
+      }
+    },
+    {
+      "size": "S",
+      "seed": 4,
+      "plant_id": "plant-12m-s4",
+      "drift": {
+        "precision": null,
+        "recall": 0.0,
+        "wear_recall": 0.0,
+        "step_recall": 0.0,
+        "healthy_false_positive_rate": 0.0,
+        "planted": [
+          "M005",
+          "M009"
+        ],
+        "flagged": [],
+        "healthy_false_positives": [],
+        "coolant_also_flagged": [],
+        "flagged_by": {}
+      },
+      "signal_health": {
+        "coolant_recall": 1.0,
+        "healthy_false_positives": [],
+        "healthy_false_positive_rate": 0.0,
+        "flagged_other_faults": []
+      },
+      "drivers": {
+        "top3": [
+          "tool_age",
+          "days_since_pm",
+          "operator_id"
+        ],
+        "reported": [
+          "tool_age",
+          "days_since_pm",
+          "operator_id"
+        ],
+        "planted_in_top3": {
+          "supplier": false,
+          "days_since_pm": true,
+          "shift": false,
+          "tool_age": true
+        },
+        "planted_reported": {
+          "supplier": false,
+          "days_since_pm": true,
+          "shift": false,
+          "tool_age": true
+        },
+        "null_reported": {
+          "operator_id": true,
+          "coolant_conc": false,
+          "weekday": false
+        },
+        "rule": "sigma"
+      },
+      "stops": {
+        "unjustified_stops": 7298,
+        "coverage_count": 0.8619,
+        "accuracy_count": 0.9785,
+        "coverage_minutes": 0.6474,
+        "accuracy_minutes": 0.6027
+      }
+    },
+    {
+      "size": "S",
+      "seed": 5,
+      "plant_id": "plant-12m-s5",
+      "drift": {
+        "precision": 1.0,
+        "recall": 0.5,
+        "wear_recall": 1.0,
+        "step_recall": 0.0,
+        "healthy_false_positive_rate": 0.0,
+        "planted": [
+          "M004",
+          "M005"
+        ],
+        "flagged": [
+          "M004"
+        ],
+        "healthy_false_positives": [],
+        "coolant_also_flagged": [],
+        "flagged_by": {
+          "M004": [
+            "envelope"
+          ]
+        }
+      },
+      "signal_health": {
+        "coolant_recall": 0.0,
+        "healthy_false_positives": [],
+        "healthy_false_positive_rate": 0.0,
+        "flagged_other_faults": [
+          "M004"
+        ]
+      },
+      "drivers": {
+        "top3": [
+          "tool_age",
+          "supplier",
+          "days_since_pm"
+        ],
+        "reported": [
+          "tool_age",
+          "supplier",
+          "days_since_pm",
+          "operator_id",
+          "hour_of_day",
+          "shift"
+        ],
+        "planted_in_top3": {
+          "supplier": true,
+          "days_since_pm": true,
+          "shift": false,
+          "tool_age": true
+        },
+        "planted_reported": {
+          "supplier": true,
+          "days_since_pm": true,
+          "shift": true,
+          "tool_age": true
+        },
+        "null_reported": {
+          "operator_id": true,
+          "coolant_conc": false,
+          "weekday": false
+        },
+        "rule": "sigma"
+      },
+      "stops": {
+        "unjustified_stops": 7492,
+        "coverage_count": 0.8516,
+        "accuracy_count": 0.9752,
+        "coverage_minutes": 0.6379,
+        "accuracy_minutes": 0.5952
+      }
+    },
+    {
+      "size": "S",
+      "seed": 6,
+      "plant_id": "plant-12m-s6",
+      "drift": {
+        "precision": 1.0,
+        "recall": 0.5,
+        "wear_recall": 1.0,
+        "step_recall": 0.0,
+        "healthy_false_positive_rate": 0.0,
+        "planted": [
+          "M008",
+          "M011"
+        ],
+        "flagged": [
+          "M008"
+        ],
+        "healthy_false_positives": [],
+        "coolant_also_flagged": [],
+        "flagged_by": {
+          "M008": [
+            "envelope"
+          ]
+        }
+      },
+      "signal_health": {
+        "coolant_recall": 1.0,
+        "healthy_false_positives": [],
+        "healthy_false_positive_rate": 0.0,
+        "flagged_other_faults": [
+          "M008"
+        ]
+      },
+      "drivers": {
+        "top3": [
+          "tool_age",
+          "days_since_pm",
+          "supplier"
+        ],
+        "reported": [
+          "tool_age",
+          "days_since_pm",
+          "supplier"
+        ],
+        "planted_in_top3": {
+          "supplier": true,
+          "days_since_pm": true,
+          "shift": false,
+          "tool_age": true
+        },
+        "planted_reported": {
+          "supplier": true,
+          "days_since_pm": true,
+          "shift": false,
+          "tool_age": true
+        },
+        "null_reported": {
+          "operator_id": false,
+          "coolant_conc": false,
+          "weekday": false
+        },
+        "rule": "sigma"
+      },
+      "stops": {
+        "unjustified_stops": 7485,
+        "coverage_count": 0.8581,
+        "accuracy_count": 0.9742,
+        "coverage_minutes": 0.6591,
+        "accuracy_minutes": 0.5703
+      }
+    },
+    {
+      "size": "S",
+      "seed": 7,
+      "plant_id": "plant-12m-s7",
+      "drift": {
+        "precision": 1.0,
+        "recall": 0.5,
+        "wear_recall": 1.0,
+        "step_recall": 0.0,
+        "healthy_false_positive_rate": 0.0,
+        "planted": [
+          "M002",
+          "M005"
+        ],
+        "flagged": [
+          "M002"
+        ],
+        "healthy_false_positives": [],
+        "coolant_also_flagged": [],
+        "flagged_by": {
+          "M002": [
+            "envelope"
+          ]
+        }
+      },
+      "signal_health": {
+        "coolant_recall": 1.0,
+        "healthy_false_positives": [],
+        "healthy_false_positive_rate": 0.0,
+        "flagged_other_faults": [
+          "M002",
+          "M005"
+        ]
+      },
+      "drivers": {
+        "top3": [
+          "tool_age",
+          "days_since_pm",
+          "supplier"
+        ],
+        "reported": [
+          "tool_age",
+          "days_since_pm",
+          "supplier"
+        ],
+        "planted_in_top3": {
+          "supplier": true,
+          "days_since_pm": true,
+          "shift": false,
+          "tool_age": true
+        },
+        "planted_reported": {
+          "supplier": true,
+          "days_since_pm": true,
+          "shift": false,
+          "tool_age": true
+        },
+        "null_reported": {
+          "operator_id": false,
+          "coolant_conc": false,
+          "weekday": false
+        },
+        "rule": "sigma"
+      },
+      "stops": {
+        "unjustified_stops": 7587,
+        "coverage_count": 0.8536,
+        "accuracy_count": 0.9832,
+        "coverage_minutes": 0.5891,
+        "accuracy_minutes": 0.7173
+      }
+    },
+    {
+      "size": "S",
+      "seed": 8,
+      "plant_id": "plant-12m-s8",
+      "drift": {
+        "precision": 1.0,
+        "recall": 0.5,
+        "wear_recall": 1.0,
+        "step_recall": 0.0,
+        "healthy_false_positive_rate": 0.0,
+        "planted": [
+          "M007",
+          "M011"
+        ],
+        "flagged": [
+          "M007"
+        ],
+        "healthy_false_positives": [],
+        "coolant_also_flagged": [],
+        "flagged_by": {
+          "M007": [
+            "envelope"
+          ]
+        }
+      },
+      "signal_health": {
+        "coolant_recall": 0.0,
+        "healthy_false_positives": [],
+        "healthy_false_positive_rate": 0.0,
+        "flagged_other_faults": [
+          "M007",
+          "M011"
+        ]
+      },
+      "drivers": {
+        "top3": [
+          "tool_age",
+          "shift",
+          "supplier"
+        ],
+        "reported": [
+          "tool_age",
+          "shift",
+          "supplier"
+        ],
+        "planted_in_top3": {
+          "supplier": true,
+          "days_since_pm": false,
+          "shift": true,
+          "tool_age": true
+        },
+        "planted_reported": {
+          "supplier": true,
+          "days_since_pm": false,
+          "shift": true,
+          "tool_age": true
+        },
+        "null_reported": {
+          "operator_id": false,
+          "coolant_conc": false,
+          "weekday": false
+        },
+        "rule": "sigma"
+      },
+      "stops": {
+        "unjustified_stops": 7382,
+        "coverage_count": 0.8789,
+        "accuracy_count": 0.9741,
+        "coverage_minutes": 0.6583,
+        "accuracy_minutes": 0.6457
+      }
+    },
+    {
+      "size": "S",
+      "seed": 9,
+      "plant_id": "plant-12m-s9",
+      "drift": {
+        "precision": 1.0,
+        "recall": 0.5,
+        "wear_recall": 1.0,
+        "step_recall": 0.0,
+        "healthy_false_positive_rate": 0.0,
+        "planted": [
+          "M005",
+          "M012"
+        ],
+        "flagged": [
+          "M012"
+        ],
+        "healthy_false_positives": [],
+        "coolant_also_flagged": [],
+        "flagged_by": {
+          "M012": [
+            "envelope"
+          ]
+        }
+      },
+      "signal_health": {
+        "coolant_recall": 1.0,
+        "healthy_false_positives": [],
+        "healthy_false_positive_rate": 0.0,
+        "flagged_other_faults": [
+          "M012"
+        ]
+      },
+      "drivers": {
+        "top3": [
+          "days_since_pm",
+          "tool_age",
+          "supplier"
+        ],
+        "reported": [
+          "days_since_pm",
+          "tool_age",
+          "supplier"
+        ],
+        "planted_in_top3": {
+          "supplier": true,
+          "days_since_pm": true,
+          "shift": false,
+          "tool_age": true
+        },
+        "planted_reported": {
+          "supplier": true,
+          "days_since_pm": true,
+          "shift": false,
+          "tool_age": true
+        },
+        "null_reported": {
+          "operator_id": false,
+          "coolant_conc": false,
+          "weekday": false
+        },
+        "rule": "sigma"
+      },
+      "stops": {
+        "unjustified_stops": 7416,
+        "coverage_count": 0.8746,
+        "accuracy_count": 0.9756,
+        "coverage_minutes": 0.6456,
+        "accuracy_minutes": 0.6535
+      }
+    },
+    {
+      "size": "S",
+      "seed": 10,
+      "plant_id": "plant-12m-s10",
+      "drift": {
+        "precision": 1.0,
+        "recall": 0.5,
+        "wear_recall": 1.0,
+        "step_recall": 0.0,
+        "healthy_false_positive_rate": 0.0,
+        "planted": [
+          "M003",
+          "M006"
+        ],
+        "flagged": [
+          "M006"
+        ],
+        "healthy_false_positives": [],
+        "coolant_also_flagged": [],
+        "flagged_by": {
+          "M006": [
+            "envelope"
+          ]
+        }
+      },
+      "signal_health": {
+        "coolant_recall": 1.0,
+        "healthy_false_positives": [],
+        "healthy_false_positive_rate": 0.0,
+        "flagged_other_faults": [
+          "M006"
+        ]
+      },
+      "drivers": {
+        "top3": [
+          "tool_age",
+          "supplier",
+          "hour_of_day"
+        ],
+        "reported": [
+          "tool_age",
+          "supplier",
+          "hour_of_day",
+          "shift",
+          "days_since_pm"
+        ],
+        "planted_in_top3": {
+          "supplier": true,
+          "days_since_pm": false,
+          "shift": false,
+          "tool_age": true
+        },
+        "planted_reported": {
+          "supplier": true,
+          "days_since_pm": true,
+          "shift": true,
+          "tool_age": true
+        },
+        "null_reported": {
+          "operator_id": false,
+          "coolant_conc": false,
+          "weekday": false
+        },
+        "rule": "sigma"
+      },
+      "stops": {
+        "unjustified_stops": 7442,
+        "coverage_count": 0.896,
+        "accuracy_count": 0.9387,
+        "coverage_minutes": 0.7505,
+        "accuracy_minutes": 0.5392
+      }
+    },
+    {
+      "size": "M",
+      "seed": 1,
+      "plant_id": "plant-40m-s1",
+      "drift": {
+        "precision": 1.0,
+        "recall": 0.8333,
+        "wear_recall": 1.0,
+        "step_recall": 0.5,
+        "healthy_false_positive_rate": 0.0,
+        "planted": [
+          "M001",
+          "M002",
+          "M008",
+          "M014",
+          "M018",
+          "M030"
+        ],
+        "flagged": [
+          "M001",
+          "M002",
+          "M008",
+          "M014",
+          "M018"
+        ],
+        "healthy_false_positives": [],
+        "coolant_also_flagged": [],
+        "flagged_by": {
+          "M001": [
+            "envelope"
+          ],
+          "M008": [
+            "envelope"
+          ],
+          "M014": [
+            "envelope"
+          ],
+          "M018": [
+            "envelope"
+          ],
+          "M002": [
+            "envelope"
+          ]
+        }
+      },
+      "signal_health": {
+        "coolant_recall": 1.0,
+        "healthy_false_positives": [],
+        "healthy_false_positive_rate": 0.0,
+        "flagged_other_faults": [
+          "M001",
+          "M002",
+          "M008"
+        ]
+      },
+      "drivers": {
+        "top3": [
+          "tool_age",
+          "days_since_pm",
+          "supplier"
+        ],
+        "reported": [
+          "tool_age",
+          "days_since_pm",
+          "supplier",
+          "weekday"
+        ],
+        "planted_in_top3": {
+          "supplier": true,
+          "days_since_pm": true,
+          "shift": false,
+          "tool_age": true
+        },
+        "planted_reported": {
+          "supplier": true,
+          "days_since_pm": true,
+          "shift": false,
+          "tool_age": true
+        },
+        "null_reported": {
+          "operator_id": false,
+          "coolant_conc": false,
+          "weekday": true
+        },
+        "rule": "sigma"
+      },
+      "stops": {
+        "unjustified_stops": 23380,
+        "coverage_count": 0.8749,
+        "accuracy_count": 0.9479,
+        "coverage_minutes": 0.7086,
+        "accuracy_minutes": 0.5655
+      }
+    },
+    {
+      "size": "M",
+      "seed": 2,
+      "plant_id": "plant-40m-s2",
+      "drift": {
+        "precision": 1.0,
+        "recall": 0.8333,
+        "wear_recall": 0.75,
+        "step_recall": 1.0,
+        "healthy_false_positive_rate": 0.0,
+        "planted": [
+          "M002",
+          "M017",
+          "M018",
+          "M021",
+          "M023",
+          "M030"
+        ],
+        "flagged": [
+          "M002",
+          "M017",
+          "M018",
+          "M021",
+          "M023"
+        ],
+        "healthy_false_positives": [],
+        "coolant_also_flagged": [],
+        "flagged_by": {
+          "M002": [
+            "envelope"
+          ],
+          "M017": [
+            "envelope"
+          ],
+          "M021": [
+            "envelope"
+          ],
+          "M018": [
+            "envelope"
+          ],
+          "M023": [
+            "envelope"
+          ]
+        }
+      },
+      "signal_health": {
+        "coolant_recall": 1.0,
+        "healthy_false_positives": [],
+        "healthy_false_positive_rate": 0.0,
+        "flagged_other_faults": [
+          "M017",
+          "M018",
+          "M023"
+        ]
+      },
+      "drivers": {
+        "top3": [
+          "tool_age",
+          "days_since_pm",
+          "supplier"
+        ],
+        "reported": [
+          "tool_age",
+          "days_since_pm",
+          "supplier"
+        ],
+        "planted_in_top3": {
+          "supplier": true,
+          "days_since_pm": true,
+          "shift": false,
+          "tool_age": true
+        },
+        "planted_reported": {
+          "supplier": true,
+          "days_since_pm": true,
+          "shift": false,
+          "tool_age": true
+        },
+        "null_reported": {
+          "operator_id": false,
+          "coolant_conc": false,
+          "weekday": false
+        },
+        "rule": "sigma"
+      },
+      "stops": {
+        "unjustified_stops": 23478,
+        "coverage_count": 0.8766,
+        "accuracy_count": 0.9673,
+        "coverage_minutes": 0.6724,
+        "accuracy_minutes": 0.6111
+      }
+    },
+    {
+      "size": "M",
+      "seed": 3,
+      "plant_id": "plant-40m-s3",
+      "drift": {
+        "precision": 1.0,
+        "recall": 0.3333,
+        "wear_recall": 0.5,
+        "step_recall": 0.0,
+        "healthy_false_positive_rate": 0.0,
+        "planted": [
+          "M006",
+          "M010",
+          "M019",
+          "M027",
+          "M032",
+          "M033"
+        ],
+        "flagged": [
+          "M027",
+          "M032"
+        ],
+        "healthy_false_positives": [],
+        "coolant_also_flagged": [],
+        "flagged_by": {
+          "M027": [
+            "envelope"
+          ],
+          "M032": [
+            "envelope"
+          ]
+        }
+      },
+      "signal_health": {
+        "coolant_recall": 1.0,
+        "healthy_false_positives": [],
+        "healthy_false_positive_rate": 0.0,
+        "flagged_other_faults": [
+          "M027",
+          "M032"
+        ]
+      },
+      "drivers": {
+        "top3": [
+          "tool_age",
+          "days_since_pm",
+          "supplier"
+        ],
+        "reported": [
+          "tool_age",
+          "days_since_pm",
+          "supplier"
+        ],
+        "planted_in_top3": {
+          "supplier": true,
+          "days_since_pm": true,
+          "shift": false,
+          "tool_age": true
+        },
+        "planted_reported": {
+          "supplier": true,
+          "days_since_pm": true,
+          "shift": false,
+          "tool_age": true
+        },
+        "null_reported": {
+          "operator_id": false,
+          "coolant_conc": false,
+          "weekday": false
+        },
+        "rule": "sigma"
+      },
+      "stops": {
+        "unjustified_stops": 23370,
+        "coverage_count": 0.8491,
+        "accuracy_count": 0.9841,
+        "coverage_minutes": 0.5157,
+        "accuracy_minutes": 0.7718
+      }
+    },
+    {
+      "size": "M",
+      "seed": 4,
+      "plant_id": "plant-40m-s4",
+      "drift": {
+        "precision": 1.0,
+        "recall": 0.6667,
+        "wear_recall": 0.5,
+        "step_recall": 1.0,
+        "healthy_false_positive_rate": 0.0,
+        "planted": [
+          "M006",
+          "M022",
+          "M027",
+          "M030",
+          "M033",
+          "M039"
+        ],
+        "flagged": [
+          "M022",
+          "M027",
+          "M030",
+          "M039"
+        ],
+        "healthy_false_positives": [],
+        "coolant_also_flagged": [],
+        "flagged_by": {
+          "M039": [
+            "envelope"
+          ],
+          "M027": [
+            "envelope"
+          ],
+          "M030": [
+            "envelope"
+          ],
+          "M022": [
+            "envelope"
+          ]
+        }
+      },
+      "signal_health": {
+        "coolant_recall": 1.0,
+        "healthy_false_positives": [],
+        "healthy_false_positive_rate": 0.0,
+        "flagged_other_faults": [
+          "M022",
+          "M027",
+          "M039"
+        ]
+      },
+      "drivers": {
+        "top3": [
+          "tool_age",
+          "supplier",
+          "days_since_pm"
+        ],
+        "reported": [
+          "tool_age",
+          "supplier",
+          "days_since_pm",
+          "hour_of_day"
+        ],
+        "planted_in_top3": {
+          "supplier": true,
+          "days_since_pm": true,
+          "shift": false,
+          "tool_age": true
+        },
+        "planted_reported": {
+          "supplier": true,
+          "days_since_pm": true,
+          "shift": false,
+          "tool_age": true
+        },
+        "null_reported": {
+          "operator_id": false,
+          "coolant_conc": false,
+          "weekday": false
+        },
+        "rule": "sigma"
+      },
+      "stops": {
+        "unjustified_stops": 23169,
+        "coverage_count": 0.8612,
+        "accuracy_count": 0.9807,
+        "coverage_minutes": 0.6288,
+        "accuracy_minutes": 0.6518
+      }
+    },
+    {
+      "size": "M",
+      "seed": 5,
+      "plant_id": "plant-40m-s5",
+      "drift": {
+        "precision": 1.0,
+        "recall": 0.6667,
+        "wear_recall": 1.0,
+        "step_recall": 0.0,
+        "healthy_false_positive_rate": 0.0,
+        "planted": [
+          "M021",
+          "M022",
+          "M023",
+          "M024",
+          "M027",
+          "M033"
+        ],
+        "flagged": [
+          "M021",
+          "M022",
+          "M023",
+          "M033"
+        ],
+        "healthy_false_positives": [],
+        "coolant_also_flagged": [],
+        "flagged_by": {
+          "M023": [
+            "envelope"
+          ],
+          "M033": [
+            "envelope"
+          ],
+          "M022": [
+            "envelope"
+          ],
+          "M021": [
+            "envelope"
+          ]
+        }
+      },
+      "signal_health": {
+        "coolant_recall": 1.0,
+        "healthy_false_positives": [],
+        "healthy_false_positive_rate": 0.0,
+        "flagged_other_faults": [
+          "M021",
+          "M022",
+          "M023",
+          "M033"
+        ]
+      },
+      "drivers": {
+        "top3": [
+          "tool_age",
+          "supplier",
+          "days_since_pm"
+        ],
+        "reported": [
+          "tool_age",
+          "supplier",
+          "days_since_pm",
+          "shift",
+          "hour_of_day"
+        ],
+        "planted_in_top3": {
+          "supplier": true,
+          "days_since_pm": true,
+          "shift": false,
+          "tool_age": true
+        },
+        "planted_reported": {
+          "supplier": true,
+          "days_since_pm": true,
+          "shift": true,
+          "tool_age": true
+        },
+        "null_reported": {
+          "operator_id": false,
+          "coolant_conc": false,
+          "weekday": false
+        },
+        "rule": "sigma"
+      },
+      "stops": {
+        "unjustified_stops": 23030,
+        "coverage_count": 0.8775,
+        "accuracy_count": 0.9716,
+        "coverage_minutes": 0.6635,
+        "accuracy_minutes": 0.6236
+      }
+    },
+    {
+      "size": "M",
+      "seed": 6,
+      "plant_id": "plant-40m-s6",
+      "drift": {
+        "precision": 1.0,
+        "recall": 0.5,
+        "wear_recall": 0.5,
+        "step_recall": 0.5,
+        "healthy_false_positive_rate": 0.0,
+        "planted": [
+          "M006",
+          "M011",
+          "M016",
+          "M025",
+          "M029",
+          "M033"
+        ],
+        "flagged": [
+          "M011",
+          "M016",
+          "M033"
+        ],
+        "healthy_false_positives": [],
+        "coolant_also_flagged": [],
+        "flagged_by": {
+          "M033": [
+            "envelope"
+          ],
+          "M016": [
+            "envelope"
+          ],
+          "M011": [
+            "envelope"
+          ]
+        }
+      },
+      "signal_health": {
+        "coolant_recall": 1.0,
+        "healthy_false_positives": [],
+        "healthy_false_positive_rate": 0.0,
+        "flagged_other_faults": [
+          "M011",
+          "M016",
+          "M029",
+          "M033"
+        ]
+      },
+      "drivers": {
+        "top3": [
+          "tool_age",
+          "supplier",
+          "days_since_pm"
+        ],
+        "reported": [
+          "tool_age",
+          "supplier",
+          "days_since_pm",
+          "hour_of_day"
+        ],
+        "planted_in_top3": {
+          "supplier": true,
+          "days_since_pm": true,
+          "shift": false,
+          "tool_age": true
+        },
+        "planted_reported": {
+          "supplier": true,
+          "days_since_pm": true,
+          "shift": false,
+          "tool_age": true
+        },
+        "null_reported": {
+          "operator_id": false,
+          "coolant_conc": false,
+          "weekday": false
+        },
+        "rule": "sigma"
+      },
+      "stops": {
+        "unjustified_stops": 23131,
+        "coverage_count": 0.866,
+        "accuracy_count": 0.9547,
+        "coverage_minutes": 0.6888,
+        "accuracy_minutes": 0.5702
+      }
+    },
+    {
+      "size": "M",
+      "seed": 7,
+      "plant_id": "plant-40m-s7",
+      "drift": {
+        "precision": 1.0,
+        "recall": 0.6667,
+        "wear_recall": 0.75,
+        "step_recall": 0.5,
+        "healthy_false_positive_rate": 0.0,
+        "planted": [
+          "M003",
+          "M006",
+          "M018",
+          "M022",
+          "M028",
+          "M040"
+        ],
+        "flagged": [
+          "M003",
+          "M006",
+          "M022",
+          "M028"
+        ],
+        "healthy_false_positives": [],
+        "coolant_also_flagged": [],
+        "flagged_by": {
+          "M028": [
+            "envelope"
+          ],
+          "M006": [
+            "envelope"
+          ],
+          "M003": [
+            "envelope"
+          ],
+          "M022": [
+            "envelope"
+          ]
+        }
+      },
+      "signal_health": {
+        "coolant_recall": 1.0,
+        "healthy_false_positives": [],
+        "healthy_false_positive_rate": 0.0,
+        "flagged_other_faults": [
+          "M003",
+          "M006",
+          "M022",
+          "M028"
+        ]
+      },
+      "drivers": {
+        "top3": [
+          "tool_age",
+          "supplier",
+          "days_since_pm"
+        ],
+        "reported": [
+          "tool_age",
+          "supplier",
+          "days_since_pm",
+          "hour_of_day"
+        ],
+        "planted_in_top3": {
+          "supplier": true,
+          "days_since_pm": true,
+          "shift": false,
+          "tool_age": true
+        },
+        "planted_reported": {
+          "supplier": true,
+          "days_since_pm": true,
+          "shift": false,
+          "tool_age": true
+        },
+        "null_reported": {
+          "operator_id": false,
+          "coolant_conc": false,
+          "weekday": false
+        },
+        "rule": "sigma"
+      },
+      "stops": {
+        "unjustified_stops": 23448,
+        "coverage_count": 0.8537,
+        "accuracy_count": 0.9799,
+        "coverage_minutes": 0.6168,
+        "accuracy_minutes": 0.6723
+      }
+    },
+    {
+      "size": "M",
+      "seed": 8,
+      "plant_id": "plant-40m-s8",
+      "drift": {
+        "precision": 1.0,
+        "recall": 0.8333,
+        "wear_recall": 0.75,
+        "step_recall": 1.0,
+        "healthy_false_positive_rate": 0.0,
+        "planted": [
+          "M001",
+          "M008",
+          "M013",
+          "M015",
+          "M025",
+          "M032"
+        ],
+        "flagged": [
+          "M001",
+          "M008",
+          "M013",
+          "M025",
+          "M032"
+        ],
+        "healthy_false_positives": [],
+        "coolant_also_flagged": [],
+        "flagged_by": {
+          "M032": [
+            "envelope"
+          ],
+          "M008": [
+            "envelope"
+          ],
+          "M025": [
+            "envelope"
+          ],
+          "M013": [
+            "envelope"
+          ],
+          "M001": [
+            "envelope"
+          ]
+        }
+      },
+      "signal_health": {
+        "coolant_recall": 1.0,
+        "healthy_false_positives": [],
+        "healthy_false_positive_rate": 0.0,
+        "flagged_other_faults": [
+          "M001",
+          "M013",
+          "M032"
+        ]
+      },
+      "drivers": {
+        "top3": [
+          "tool_age",
+          "supplier",
+          "shift"
+        ],
+        "reported": [
+          "tool_age",
+          "supplier",
+          "shift",
+          "days_since_pm"
+        ],
+        "planted_in_top3": {
+          "supplier": true,
+          "days_since_pm": false,
+          "shift": true,
+          "tool_age": true
+        },
+        "planted_reported": {
+          "supplier": true,
+          "days_since_pm": true,
+          "shift": true,
+          "tool_age": true
+        },
+        "null_reported": {
+          "operator_id": false,
+          "coolant_conc": false,
+          "weekday": false
+        },
+        "rule": "sigma"
+      },
+      "stops": {
+        "unjustified_stops": 23478,
+        "coverage_count": 0.8705,
+        "accuracy_count": 0.9542,
+        "coverage_minutes": 0.6887,
+        "accuracy_minutes": 0.5814
+      }
+    },
+    {
+      "size": "M",
+      "seed": 9,
+      "plant_id": "plant-40m-s9",
+      "drift": {
+        "precision": 1.0,
+        "recall": 0.6667,
+        "wear_recall": 1.0,
+        "step_recall": 0.0,
+        "healthy_false_positive_rate": 0.0,
+        "planted": [
+          "M014",
+          "M017",
+          "M020",
+          "M026",
+          "M027",
+          "M034"
+        ],
+        "flagged": [
+          "M014",
+          "M017",
+          "M026",
+          "M034"
+        ],
+        "healthy_false_positives": [],
+        "coolant_also_flagged": [],
+        "flagged_by": {
+          "M026": [
+            "envelope"
+          ],
+          "M017": [
+            "envelope"
+          ],
+          "M014": [
+            "envelope"
+          ],
+          "M034": [
+            "envelope"
+          ]
+        }
+      },
+      "signal_health": {
+        "coolant_recall": 1.0,
+        "healthy_false_positives": [],
+        "healthy_false_positive_rate": 0.0,
+        "flagged_other_faults": [
+          "M014",
+          "M017",
+          "M026",
+          "M027",
+          "M034"
+        ]
+      },
+      "drivers": {
+        "top3": [
+          "tool_age",
+          "supplier",
+          "days_since_pm"
+        ],
+        "reported": [
+          "tool_age",
+          "supplier",
+          "days_since_pm",
+          "operator_id",
+          "shift",
+          "weekday"
+        ],
+        "planted_in_top3": {
+          "supplier": true,
+          "days_since_pm": true,
+          "shift": false,
+          "tool_age": true
+        },
+        "planted_reported": {
+          "supplier": true,
+          "days_since_pm": true,
+          "shift": true,
+          "tool_age": true
+        },
+        "null_reported": {
+          "operator_id": true,
+          "coolant_conc": false,
+          "weekday": true
+        },
+        "rule": "sigma"
+      },
+      "stops": {
+        "unjustified_stops": 23524,
+        "coverage_count": 0.9034,
+        "accuracy_count": 0.939,
+        "coverage_minutes": 0.7691,
+        "accuracy_minutes": 0.5181
+      }
+    },
+    {
+      "size": "M",
+      "seed": 10,
+      "plant_id": "plant-40m-s10",
+      "drift": {
+        "precision": 1.0,
+        "recall": 0.1667,
+        "wear_recall": 0.25,
+        "step_recall": 0.0,
+        "healthy_false_positive_rate": 0.0,
+        "planted": [
+          "M021",
+          "M025",
+          "M027",
+          "M028",
+          "M034",
+          "M040"
+        ],
+        "flagged": [
+          "M027"
+        ],
+        "healthy_false_positives": [],
+        "coolant_also_flagged": [],
+        "flagged_by": {
+          "M027": [
+            "envelope"
+          ]
+        }
+      },
+      "signal_health": {
+        "coolant_recall": 1.0,
+        "healthy_false_positives": [],
+        "healthy_false_positive_rate": 0.0,
+        "flagged_other_faults": [
+          "M027"
+        ]
+      },
+      "drivers": {
+        "top3": [
+          "tool_age",
+          "days_since_pm",
+          "supplier"
+        ],
+        "reported": [
+          "tool_age",
+          "days_since_pm",
+          "supplier"
+        ],
+        "planted_in_top3": {
+          "supplier": true,
+          "days_since_pm": true,
+          "shift": false,
+          "tool_age": true
+        },
+        "planted_reported": {
+          "supplier": true,
+          "days_since_pm": true,
+          "shift": false,
+          "tool_age": true
+        },
+        "null_reported": {
+          "operator_id": false,
+          "coolant_conc": false,
+          "weekday": false
+        },
+        "rule": "sigma"
+      },
+      "stops": {
+        "unjustified_stops": 23350,
+        "coverage_count": 0.9065,
+        "accuracy_count": 0.9279,
+        "coverage_minutes": 0.7901,
+        "accuracy_minutes": 0.5071
+      }
+    }
+  ],
+  "aggregate": {
+    "n_runs": 20,
+    "drift": {
+      "precision_mean": 1.0,
+      "precision_min": 1.0,
+      "recall_mean": 0.5333,
+      "recall_min": 0.0,
+      "wear_recall_mean": 0.8,
+      "step_recall_mean": 0.225,
+      "healthy_false_positive_rate_mean": 0.0,
+      "healthy_false_positive_rate_max": 0.0
+    },
+    "signal_health": {
+      "coolant_recall_mean": 0.9,
+      "coolant_recall_min": 0.0,
+      "healthy_false_positive_rate_mean": 0.0,
+      "healthy_false_positive_rate_max": 0.0
+    },
+    "drivers": {
+      "planted_in_top3_mean": 0.7125,
+      "planted_in_top3_min": 0.5,
+      "per_driver_top3_rate": {
+        "days_since_pm": {
+          "rate": 0.85,
+          "runs": 20
+        },
+        "shift": {
+          "rate": 0.1,
+          "runs": 20
+        },
+        "supplier": {
+          "rate": 0.9,
+          "runs": 20
+        },
+        "tool_age": {
+          "rate": 1.0,
+          "runs": 20
+        }
+      },
+      "planted_reported_mean": 0.8,
+      "per_driver_reported_rate": {
+        "days_since_pm": {
+          "rate": 0.95,
+          "runs": 20
+        },
+        "shift": {
+          "rate": 0.3,
+          "runs": 20
+        },
+        "supplier": {
+          "rate": 0.95,
+          "runs": 20
+        },
+        "tool_age": {
+          "rate": 1.0,
+          "runs": 20
+        }
+      },
+      "per_null_reported_rate": {
+        "coolant_conc": {
+          "rate": 0.0,
+          "runs": 20
+        },
+        "operator_id": {
+          "rate": 0.2,
+          "runs": 20
+        },
+        "weekday": {
+          "rate": 0.15,
+          "runs": 20
+        }
+      },
+      "any_null_reported_rate": 0.25
+    },
+    "stops": {
+      "coverage_count_mean": 0.8724,
+      "coverage_count_min": 0.8491,
+      "accuracy_count_mean": 0.965,
+      "accuracy_count_min": 0.9279,
+      "coverage_minutes_mean": 0.6636,
+      "coverage_minutes_min": 0.5157,
+      "accuracy_minutes_mean": 0.6145,
+      "accuracy_minutes_min": 0.5071
+    }
+  },
+  "by_size": {
+    "S": {
+      "n_runs": 10,
+      "drift": {
+        "precision_mean": 1.0,
+        "precision_min": 1.0,
+        "recall_mean": 0.45,
+        "recall_min": 0.0,
+        "wear_recall_mean": 0.9,
+        "step_recall_mean": 0.0,
+        "healthy_false_positive_rate_mean": 0.0,
+        "healthy_false_positive_rate_max": 0.0
+      },
+      "signal_health": {
+        "coolant_recall_mean": 0.8,
+        "coolant_recall_min": 0.0,
+        "healthy_false_positive_rate_mean": 0.0,
+        "healthy_false_positive_rate_max": 0.0
+      },
+      "drivers": {
+        "planted_in_top3_mean": 0.675,
+        "planted_in_top3_min": 0.5,
+        "per_driver_top3_rate": {
+          "days_since_pm": {
+            "rate": 0.8,
+            "runs": 10
+          },
+          "shift": {
+            "rate": 0.1,
+            "runs": 10
+          },
+          "supplier": {
+            "rate": 0.8,
+            "runs": 10
+          },
+          "tool_age": {
+            "rate": 1.0,
+            "runs": 10
+          }
+        },
+        "planted_reported_mean": 0.775,
+        "per_driver_reported_rate": {
+          "days_since_pm": {
+            "rate": 0.9,
+            "runs": 10
+          },
+          "shift": {
+            "rate": 0.3,
+            "runs": 10
+          },
+          "supplier": {
+            "rate": 0.9,
+            "runs": 10
+          },
+          "tool_age": {
+            "rate": 1.0,
+            "runs": 10
+          }
+        },
+        "per_null_reported_rate": {
+          "coolant_conc": {
+            "rate": 0.0,
+            "runs": 10
+          },
+          "operator_id": {
+            "rate": 0.3,
+            "runs": 10
+          },
+          "weekday": {
+            "rate": 0.1,
+            "runs": 10
+          }
+        },
+        "any_null_reported_rate": 0.3
+      },
+      "stops": {
+        "coverage_count_mean": 0.8708,
+        "coverage_count_min": 0.8516,
+        "accuracy_count_mean": 0.9693,
+        "accuracy_count_min": 0.9387,
+        "coverage_minutes_mean": 0.653,
+        "coverage_minutes_min": 0.5351,
+        "accuracy_minutes_mean": 0.6216,
+        "accuracy_minutes_min": 0.5183
+      }
+    },
+    "M": {
+      "n_runs": 10,
+      "drift": {
+        "precision_mean": 1.0,
+        "precision_min": 1.0,
+        "recall_mean": 0.6167,
+        "recall_min": 0.1667,
+        "wear_recall_mean": 0.7,
+        "step_recall_mean": 0.45,
+        "healthy_false_positive_rate_mean": 0.0,
+        "healthy_false_positive_rate_max": 0.0
+      },
+      "signal_health": {
+        "coolant_recall_mean": 1.0,
+        "coolant_recall_min": 1.0,
+        "healthy_false_positive_rate_mean": 0.0,
+        "healthy_false_positive_rate_max": 0.0
+      },
+      "drivers": {
+        "planted_in_top3_mean": 0.75,
+        "planted_in_top3_min": 0.75,
+        "per_driver_top3_rate": {
+          "days_since_pm": {
+            "rate": 0.9,
+            "runs": 10
+          },
+          "shift": {
+            "rate": 0.1,
+            "runs": 10
+          },
+          "supplier": {
+            "rate": 1.0,
+            "runs": 10
+          },
+          "tool_age": {
+            "rate": 1.0,
+            "runs": 10
+          }
+        },
+        "planted_reported_mean": 0.825,
+        "per_driver_reported_rate": {
+          "days_since_pm": {
+            "rate": 1.0,
+            "runs": 10
+          },
+          "shift": {
+            "rate": 0.3,
+            "runs": 10
+          },
+          "supplier": {
+            "rate": 1.0,
+            "runs": 10
+          },
+          "tool_age": {
+            "rate": 1.0,
+            "runs": 10
+          }
+        },
+        "per_null_reported_rate": {
+          "coolant_conc": {
+            "rate": 0.0,
+            "runs": 10
+          },
+          "operator_id": {
+            "rate": 0.1,
+            "runs": 10
+          },
+          "weekday": {
+            "rate": 0.2,
+            "runs": 10
+          }
+        },
+        "any_null_reported_rate": 0.2
+      },
+      "stops": {
+        "coverage_count_mean": 0.8739,
+        "coverage_count_min": 0.8491,
+        "accuracy_count_mean": 0.9607,
+        "accuracy_count_min": 0.9279,
+        "coverage_minutes_mean": 0.6742,
+        "coverage_minutes_min": 0.5157,
+        "accuracy_minutes_mean": 0.6073,
+        "accuracy_minutes_min": 0.5071
+      }
+    }
+  }
+}

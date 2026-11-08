@@ -1,8 +1,9 @@
 """Full detection grid. Off by default: pytest -m slow.
 
 Floors are the means in results/eval/summary.json (2026-11-07, stock, seeds 1-10, sizes S and M)
-minus 0.10. The healthy-machine false-positive ceiling is the measured maximum (0) plus 0.05.
-The null-driver ceiling is the measured rate plus 0.10.
+minus 0.10. Drift recall was re-measured on 2026-11-08 after the step test (tool version 0.4.0).
+The healthy-machine false-positive ceilings (signal health and drift) are the measured maximum (0)
+plus 0.05. The null-driver ceiling is the measured rate plus 0.10.
 """
 import pytest
 
@@ -10,7 +11,7 @@ from bench.evaluate import run
 
 MEASURED_MEAN = {
     "drift_precision": 1.0,
-    "drift_recall": 0.5333,
+    "drift_recall": 0.9833,
     "coolant_recall": 0.9,
     "planted_in_top3": 0.7125,
     "coverage_count": 0.8724,
@@ -28,6 +29,7 @@ def test_detection_floors(tmp_path):
     agg = summary["aggregate"]
     assert agg["drift"]["precision_mean"] >= MEASURED_MEAN["drift_precision"] - MEAN_MARGIN
     assert agg["drift"]["recall_mean"] >= MEASURED_MEAN["drift_recall"] - MEAN_MARGIN
+    assert agg["drift"]["healthy_false_positive_rate_max"] <= FP_CEILING
     assert agg["signal_health"]["coolant_recall_mean"] >= MEASURED_MEAN["coolant_recall"] - MEAN_MARGIN
     assert agg["signal_health"]["healthy_false_positive_rate_max"] <= FP_CEILING
     assert agg["drivers"]["planted_in_top3_mean"] >= MEASURED_MEAN["planted_in_top3"] - MEAN_MARGIN

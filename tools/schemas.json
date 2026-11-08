@@ -29,7 +29,7 @@
     },
     {
       "name": "detect_cycle_drift",
-      "description": "Finds machines whose recent part cycles left their normal envelope (nearest-neighbour distance in a 6-signal space, per machine and program, last 7 days vs the 21 days before). Returns flagged machines with cycle-time change in %, share of cycles outside the envelope, estimated start date and the signals that moved most. New programs without a baseline are listed, not scored. Use for: 'is anything getting slower', 'why is output down on machine X'.",
+      "description": "Finds machines whose recent part cycles left their normal envelope (nearest-neighbour distance in a 6-signal space, per machine and program, last 7 days vs the 21 days before), or whose daily median cycle time stepped up (CUSUM step test per machine, at least 2% above the reference days). Returns flagged machines with cycle-time change in %, share of cycles outside the envelope, the step-test change and start date when it fired, estimated start date and the signals that moved most. New programs without a baseline are listed, not scored. Use for: 'is anything getting slower', 'why is output down on machine X'.",
       "input_schema": {
         "type": "object",
         "properties": {

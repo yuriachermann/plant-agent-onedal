@@ -86,3 +86,15 @@ def test_driver_null_rules(plant):
     assert {r["driver"] for r in shadow["ranking"]} == {r["driver"] for r in sigma["ranking"]}
     with pytest.raises(ValueError):
         TOOLS["rank_loss_drivers"](plant, None, null_rule="nope")
+
+
+def test_drift_step_test_flags_planted_step(plant):
+    set_backend("stock")
+    env = TOOLS["detect_cycle_drift"](plant, None)
+    flagged = {f["machine_id"]: f for f in env["result"]["flagged"]}
+    for m in plant.truth["drift_step"]:
+        assert m in flagged and "step" in flagged[m]["flagged_by"]
+        assert flagged[m]["step"]["change_pct"] >= env["params"]["step_min_pct"]
+    off = TOOLS["detect_cycle_drift"](plant, None, step_test=False)
+    assert all(f["flagged_by"] == ["envelope"] for f in off["result"]["flagged"])
+    assert {f["machine_id"] for f in off["result"]["flagged"]} <= set(flagged)

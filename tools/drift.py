@@ -8,6 +8,15 @@ envelope when its score exceeds the 99th percentile of reference scores
 machine is flagged when a large share of its recent cycles are outside.
 Programs without enough reference cycles (new programs) are skipped and
 listed, never scored against another program's baseline.
+
+Beside the envelope, a step test runs per machine. Each cycle time is divided
+by its program's reference median. The machine's daily median of that ratio
+feeds a one-sided CUSUM over the recent days, in units of the reference days'
+standard deviation (slack ``step_k``, alarm at ``step_h``). The test fires when
+the CUSUM alarms and the daily median since the alarm is at least
+``step_min_pct`` above the reference. Daily medians smooth out the cycle-to-cycle
+noise that hides a small, steady slowdown from the per-cycle envelope. A
+machine is flagged when either test fires.
 """
 from __future__ import annotations
 
@@ -20,10 +29,41 @@ from .common import Timer, day_to_date, envelope, fingerprint, scope_machines, s
 FEATS = ["rel_cycle", "spindle_load", "feed_override", "vibration_rms", "motor_current", "spindle_speed"]
 # cycle time is what this tool is about: it counts double in the distance
 WEIGHTS = np.array([2.0, 1.0, 1.0, 1.0, 1.0, 1.0])
+STEP_MIN_REF_DAYS = 5
+
+
+def _step_test(days: np.ndarray, ratio: np.ndarray, t0: int, k_sigma: float, h_sigma: float, min_pct: float,
+               min_day_cycles: int) -> dict | None:
+    """One-sided CUSUM on the daily median of cycle time / program reference median. None if it cannot run."""
+    s = pd.Series(ratio).groupby(days)
+    med = s.median()[s.size() >= min_day_cycles]
+    ref = med[med.index < t0]
+    test = med[med.index >= t0]
+    if len(ref) < STEP_MIN_REF_DAYS or len(test) == 0:
+        return None
+    center = float(ref.median())
+    sd = float(ref.std(ddof=1))
+    if not np.isfinite(sd) or sd <= 0:
+        return None
+    cusum, peak, run_start, start, alarm = 0.0, 0.0, None, None, None
+    for d, v in test.items():
+        if cusum == 0.0:
+            run_start = int(d)
+        cusum = max(0.0, cusum + (v - center) / sd - k_sigma)
+        peak = max(peak, cusum)
+        if alarm is None and cusum >= h_sigma:
+            alarm, start = int(d), run_start
+    change = float(test[test.index >= alarm].median() / center - 1) * 100 if alarm is not None else None
+    return {"detected": bool(change is not None and change >= min_pct), "cusum_max_sigma": round(peak, 1),
+            "start_day": start, "alarm_day": alarm, "change_pct": None if change is None else round(change, 2),
+            "reference_sd_pct": round(100 * sd / center, 3), "reference_days": int(len(ref)),
+            "test_days": int(len(test))}
 
 
 def detect_cycle_drift(plant, scope: dict | None = None, test_days: int = 7, ref_days: int = 21, k: int = 10,
-                       min_cycles: int = 150, q: float = 0.99, flag_share: float = 0.25) -> dict:
+                       min_cycles: int = 150, q: float = 0.99, flag_share: float = 0.25, step_test: bool = True,
+                       step_k: float = 0.5, step_h: float = 5.0, step_min_pct: float = 2.0,
+                       step_min_day_cycles: int = 20) -> dict:
     est = B.estimators()
     T = Timer()
     scope = scope or {}
@@ -37,6 +77,7 @@ def detect_cycle_drift(plant, scope: dict | None = None, test_days: int = 7, ref
         groups = list(c.groupby(["machine_id", "program_id"], sort=True))
     T.ms["ml_knn"] = 0.0
     per_cycle, per_prog, skipped = [], [], []
+    step_parts: dict[str, list[tuple[np.ndarray, np.ndarray]]] = {}
     for (m, p), g in groups:
         with T.phase("prep"):
             is_ref = g["day"].to_numpy() < t0
@@ -64,10 +105,11 @@ def detect_cycle_drift(plant, scope: dict | None = None, test_days: int = 7, ref
                 "out": score > thr, "excess": score / thr,
                 **{f: Q[:, i] / WEIGHTS[i] for i, f in enumerate(FEATS)},
             }))
+            ref_median = np.median(g.loc[is_ref, "cycle_s"])
             per_prog.append({"machine_id": m, "program_id": p, "ref_cycles": int(len(R)), "recent_cycles": int(len(Q)),
                              "outside_share": round(float((score > thr).mean()), 3),
-                             "cycle_time_change_pct": round(100 * (np.median(gq["cycle_s"]) /
-                                                                   np.median(g.loc[is_ref, "cycle_s"]) - 1), 2)})
+                             "cycle_time_change_pct": round(100 * (np.median(gq["cycle_s"]) / ref_median - 1), 2)})
+            step_parts.setdefault(m, []).append((g["day"].to_numpy(), g["cycle_s"].to_numpy(np.float64) / ref_median))
     with T.phase("post"):
         flagged, facts = [], {}
         machines_checked = 0
@@ -82,24 +124,39 @@ def detect_cycle_drift(plant, scope: dict | None = None, test_days: int = 7, ref
                 w = pp[pp["machine_id"] == m]
                 moved = g.loc[g["out"], FEATS].median() if g["out"].any() else g[FEATS].median()
                 moved = sorted(moved.items(), key=lambda t: -abs(t[1]))[:3]
+                step = None
+                if step_test and m in step_parts:
+                    days_m = np.concatenate([d for d, _ in step_parts[m]])
+                    ratio_m = np.concatenate([r for _, r in step_parts[m]])
+                    step = _step_test(days_m, ratio_m, t0, step_k, step_h, step_min_pct, step_min_day_cycles)
+                share = round(float(g["out"].mean()), 3)
+                by = (["envelope"] if share >= flag_share else []) + (["step"] if step and step["detected"] else [])
                 rows.append({
                     "machine_id": m, "programs": int(len(w)), "recent_cycles": int(len(g)),
-                    "outside_share": round(float(g["out"].mean()), 3),
+                    "outside_share": share,
                     "cycle_time_change_pct": round(float(np.average(w["cycle_time_change_pct"], weights=w["recent_cycles"])), 2),
                     "onset_day": onset,
                     "moved": [{"signal": f, "shift_sigma": round(float(z), 2)} for f, z in moved],
                     "worst_cycles": g.sort_values("excess", ascending=False)["cycle_id"].head(5).astype(int).tolist(),
+                    "step": step,
+                    "flagged_by": by,
                 })
-            res = pd.DataFrame(rows).sort_values(["outside_share", "machine_id"], ascending=[False, True])
-            for i, item in enumerate(res[res["outside_share"] >= flag_share].to_dict("records"), 1):
+            rows.sort(key=lambda r: (-r["outside_share"], r["machine_id"]))
+            for i, item in enumerate((r for r in rows if r["flagged_by"]), 1):
                 item["onset_date"] = day_to_date(plant, item["onset_day"]) if item["onset_day"] is not None else None
                 flagged.append(item)
                 mv = ", ".join(f"{d['signal']} {d['shift_sigma']:+.1f}σ" for d in item["moved"])
+                st = ""
+                if "step" in item["flagged_by"]:
+                    s = item["step"]
+                    st = (f" Daily median cycle time is {s['change_pct']:+.1f}% above the reference days since about "
+                          f"{day_to_date(plant, s['alarm_day'])} (step test, change from about "
+                          f"{day_to_date(plant, s['start_day'])}).")
                 facts[f"D{i}"] = (
                     f"Drift D{i}: {item['machine_id']} cycle time {item['cycle_time_change_pct']:+.1f}% vs the previous "
                     f"{ref_days} days; {item['outside_share']:.0%} of its cycles in the last {test_days} days are outside "
                     f"the normal envelope" + (f", starting about {item['onset_date']}" if item["onset_date"] else "")
-                    + f". Biggest moves: {mv}."
+                    + "." + st + f" Biggest moves: {mv}."
                 )
         result = {
             "window": {"reference_days": [r0, t0 - 1], "test_days": [t0, d1]},
@@ -112,7 +169,9 @@ def detect_cycle_drift(plant, scope: dict | None = None, test_days: int = 7, ref
         facts["N"] = (f"Checked {pl(len(per_prog), 'machine-program')} on {pl(machines_checked, 'machine')}; "
                       f"{pl(len(flagged), 'machine')} with cycle-time drift; {pl(len(skipped), 'new program')} "
                       "skipped for lack of a baseline.")
-    params = {"test_days": test_days, "ref_days": ref_days, "k": k, "q": q, "flag_share": flag_share, "features": FEATS}
+    params = {"test_days": test_days, "ref_days": ref_days, "k": k, "q": q, "flag_share": flag_share, "features": FEATS,
+              "step_test": step_test, "step_k": step_k, "step_h": step_h, "step_min_pct": step_min_pct,
+              "step_min_day_cycles": step_min_day_cycles}
     return envelope("detect_cycle_drift", scope, params, fingerprint(c["cycle_id"].to_numpy(), c["cycle_s"].to_numpy()),
                     result, facts, T,
                     extra={"_scores": {(r["machine_id"], r["program_id"]): r["outside_share"] for r in per_prog}})

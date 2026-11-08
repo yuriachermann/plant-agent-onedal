@@ -4,7 +4,7 @@ Backend `stock`, seeds [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], sizes ['S', 'M'], 20 pla
 
 ## Drift (wear + step)
 
-Precision mean 100.0% (min 100.0%) on the 19 plants that flagged at least one machine. Recall mean 53.3% (min 0.0%).
+Precision mean 100.0% (min 100.0%) on the 20 plants that flagged at least one machine. Recall mean 98.3% (min 66.7%): wear 97.5%, step 100.0%. Healthy-machine false-positive rate mean 0.0% (max 0.0%). Step test on.
 
 ## Signal health
 
@@ -42,5 +42,5 @@ Accuracy is the share of suggestions that match `reason_true`, among unjustified
 
 | Size | Drift recall | Coolant recall | Planted drivers in top 3 | Stop coverage | Stop accuracy |
 |---|---:|---:|---:|---:|---:|
-| S | 45.0% | 80.0% | 67.5% | 87.1% | 96.9% |
-| M | 61.7% | 100.0% | 75.0% | 87.4% | 96.1% |
+| S | 100.0% | 80.0% | 67.5% | 87.1% | 96.9% |
+| M | 96.7% | 100.0% | 75.0% | 87.4% | 96.1% |
