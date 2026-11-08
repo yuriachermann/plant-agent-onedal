@@ -98,3 +98,7 @@ Host: the same 12th Gen Intel Core i5-12450H (8 cores, 12 logical processors, 63
 - `ruff check .`: all checks passed.
 - `pytest -q`: 25 passed, 1 deselected, in 46.33s.
 - `python -m bench.parity`: PASS in 45.7s wall. Metrics unchanged from the record in `results/parity.json`: ARI 1.0 and noise agreement 1.0 on both scopes, drift flags M003, M006, M022, M028 with max share difference 0.0, drivers top 3 tool_age, supplier, days_since_pm with Spearman 0.9301 (plant) and 0.8807 (line) and ΔR² 0.0017 and 0.007, signal_health flags M002, M003, M006, M020, M022, M028 with max share difference 0.0. Only `checked_at` changed, so the rewritten `results/parity.json` and `results/parity_report.md` were restored.
+
+## CLAUDE.md
+
+Outcome: `CLAUDE.md` holds the session rules and a one-line-per-folder map. `pytest -q`: 25 passed, 1 deselected.

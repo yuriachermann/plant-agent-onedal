@@ -11,3 +11,4 @@
 - `bench/deck_numbers.py` writes the slide table for a benchmark directory. For `results/intel-xeon-2t` it reproduces the talk figures, including plant M seed 7 stop suggestions from `results/eval/summary.json`.
 - Recorded a signal_health thread-pool probe on this 12-thread laptop. The Xeon slowdown did not appear, and no tool change was made. See `docs/findings/signal-health-slowdown.md`.
 - DBSCAN `eps` / `min_samples` left unchanged. Across seeds 1–10 the irregular share stays inside a 2-point band per scope. See `docs/findings/dbscan-heuristic.md`.
+- `CLAUDE.md` holds the working rules and a repo map for later sessions.
