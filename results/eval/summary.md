@@ -1,6 +1,6 @@
 # Detection quality against planted truth
 
-Backend `stock`, seeds [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], sizes ['S', 'M'], 20 plants. Definitions are in `summary.json`.
+Backend `stock`, seeds [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], sizes ['S', 'M'], 20 plants, driver rule `sigma`. Definitions are in `summary.json`.
 
 ## Drift (wear + step)
 
@@ -12,14 +12,14 @@ Coolant recall mean 90.0% (min 0.0%). Healthy-machine false-positive rate mean 0
 
 ## Loss drivers
 
-Share of planted drivers in the top 3: mean 71.2% (min 50.0%). Runs with any null driver reported: 25.0%.
+Share of planted drivers in the top 3: mean 71.2% (min 50.0%). Share of planted drivers reported: mean 80.0%. Runs with any null driver reported: 25.0%.
 
-| Planted driver | Share of runs in the top 3 |
-|---|---:|
-| days_since_pm | 85.0% |
-| shift | 10.0% |
-| supplier | 90.0% |
-| tool_age | 100.0% |
+| Planted driver | Share of runs in the top 3 | Share of runs reported |
+|---|---:|---:|
+| days_since_pm | 85.0% | 95.0% |
+| shift | 10.0% | 30.0% |
+| supplier | 90.0% | 95.0% |
+| tool_age | 100.0% | 100.0% |
 
 | Null driver | Share of runs reported |
 |---|---:|

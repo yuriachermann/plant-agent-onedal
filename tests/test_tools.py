@@ -68,3 +68,21 @@ def test_csv_round_trip(plant, tmp_path):
     a = TOOLS["detect_cycle_drift"](plant, None)
     b = TOOLS["detect_cycle_drift"](p2, None)
     assert a["result"]["flagged"] == b["result"]["flagged"]
+
+
+def test_driver_null_rules(plant):
+    set_backend("stock")
+    sigma = TOOLS["rank_loss_drivers"](plant, None)["result"]
+    shadow = TOOLS["rank_loss_drivers"](plant, None, null_rule="shadow")["result"]
+    assert sigma["null_rule"] == "sigma" and "shadow_max_importance" not in sigma
+    assert shadow["null_rule"] == "shadow"
+    floor = max(shadow["shadow_max_importance"], 0.0)
+    for item in shadow["ranking"][:6]:
+        # rounded to 4 decimals in the result, so only check clear cases
+        if item["importance"] > floor + 1e-4:
+            assert item["reported"]
+        elif item["importance"] < floor - 1e-4:
+            assert not item["reported"]
+    assert {r["driver"] for r in shadow["ranking"]} == {r["driver"] for r in sigma["ranking"]}
+    with pytest.raises(ValueError):
+        TOOLS["rank_loss_drivers"](plant, None, null_rule="nope")

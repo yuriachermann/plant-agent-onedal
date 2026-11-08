@@ -125,8 +125,10 @@ The numbers below are from `results/eval/summary.json` (stock scikit-learn, 20 p
 * **Signal health.** Coolant recall averages 90% (100% on M, and 0 on two size-S plants). No healthy
   machine was flagged. Healthy means no wear, step, or coolant fault.
 * **Drivers.** On average 71.2% of the planted drivers land in the top 3: tool age in every run,
-  supplier in 90%, days since maintenance in 85%, shift in 10%. A null driver is reported in 25% of
-  runs (operator 20%, weekday 15%, coolant concentration in none).
+  supplier in 90%, days since maintenance in 85%, shift in 10%. The tool reports 80% of planted
+  drivers (shift in 30% of runs). A null driver is reported in 25% of runs (operator 20%, weekday 15%,
+  coolant concentration in none). A shadow-feature rule did worse: nulls in 55% of runs
+  (`results/eval/drivers-shadow/summary.json`), so the 2σ / 20% rule stays.
 * **Stop suggestions.** Coverage averages 87.2% of unjustified stops (66.4% of their minutes).
   Accuracy is 96.5% by count and 61.5% weighted by minutes. Plant M, seed 7, which the slides quote:
   coverage 85.4%, accuracy 98.0%, accuracy weighted by minutes 67.2%

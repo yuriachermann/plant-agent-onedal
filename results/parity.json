@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-11-07T17:29:10+00:00",
+  "checked_at": "2026-11-08T03:24:22+00:00",
   "plant": {
     "plant_id": "plant-40m-s7",
     "machines": 40,
@@ -16,7 +16,7 @@
     "sklearnex": "2026.2.0",
     "onedal": "2026.2.0"
   },
-  "tool_version": "0.2.0",
+  "tool_version": "0.3.0",
   "tolerances": {
     "cluster_stops": {
       "family_ari_min": 0.99,
@@ -39,10 +39,10 @@
   "tools": {
     "cluster_stops": {
       "pass": true,
-      "tool_version": "0.2.0",
+      "tool_version": "0.3.0",
       "sklearn": "1.9.1",
       "sklearnex": "2026.2.0",
-      "checked_at": "2026-11-07T17:29:10+00:00",
+      "checked_at": "2026-11-08T03:24:22+00:00",
       "scopes": {
         "plant": {
           "pass": true,
@@ -78,10 +78,10 @@
     },
     "detect_cycle_drift": {
       "pass": true,
-      "tool_version": "0.2.0",
+      "tool_version": "0.3.0",
       "sklearn": "1.9.1",
       "sklearnex": "2026.2.0",
-      "checked_at": "2026-11-07T17:29:10+00:00",
+      "checked_at": "2026-11-08T03:24:22+00:00",
       "scopes": {
         "plant": {
           "pass": true,
@@ -133,10 +133,10 @@
     },
     "rank_loss_drivers": {
       "pass": true,
-      "tool_version": "0.2.0",
+      "tool_version": "0.3.0",
       "sklearn": "1.9.1",
       "sklearnex": "2026.2.0",
-      "checked_at": "2026-11-07T17:29:10+00:00",
+      "checked_at": "2026-11-08T03:24:22+00:00",
       "scopes": {
         "plant": {
           "pass": true,
@@ -198,10 +198,10 @@
     },
     "signal_health": {
       "pass": true,
-      "tool_version": "0.2.0",
+      "tool_version": "0.3.0",
       "sklearn": "1.9.1",
       "sklearnex": "2026.2.0",
-      "checked_at": "2026-11-07T17:29:10+00:00",
+      "checked_at": "2026-11-08T03:24:22+00:00",
       "scopes": {
         "plant": {
           "pass": true,

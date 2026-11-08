@@ -16,11 +16,12 @@
     "S",
     "M"
   ],
+  "drivers_rule": "sigma",
   "definitions": {
     "drift_positive": "drift_wear \u222a drift_step. Other flagged machines, including coolant faults, are false positives.",
     "signal_health_healthy": "Machines with no wear, step, or coolant fault.",
     "drivers_top3": "First three rows of ranking, ordered by permutation importance.",
-    "drivers_reported": "ranking[].reported, the tool's own threshold.",
+    "drivers_reported": "ranking[].reported, the tool's own rule (drivers_rule).",
     "stops_unjustified": "reason_reported is blank.",
     "stops_accuracy": "suggested reason equals reason_true, among unjustified stops that got a suggestion.",
     "stops_minutes": "Weighted by duration_s."
@@ -66,11 +67,18 @@
           "shift": false,
           "tool_age": true
         },
+        "planted_reported": {
+          "supplier": true,
+          "days_since_pm": true,
+          "shift": false,
+          "tool_age": true
+        },
         "null_reported": {
           "operator_id": false,
           "coolant_conc": false,
           "weekday": false
-        }
+        },
+        "rule": "sigma"
       },
       "stops": {
         "unjustified_stops": 7350,
@@ -117,11 +125,18 @@
           "shift": false,
           "tool_age": true
         },
+        "planted_reported": {
+          "supplier": true,
+          "days_since_pm": true,
+          "shift": false,
+          "tool_age": true
+        },
         "null_reported": {
           "operator_id": false,
           "coolant_conc": false,
           "weekday": false
-        }
+        },
+        "rule": "sigma"
       },
       "stops": {
         "unjustified_stops": 7538,
@@ -171,11 +186,18 @@
           "shift": false,
           "tool_age": true
         },
+        "planted_reported": {
+          "supplier": true,
+          "days_since_pm": true,
+          "shift": false,
+          "tool_age": true
+        },
         "null_reported": {
           "operator_id": true,
           "coolant_conc": false,
           "weekday": true
-        }
+        },
+        "rule": "sigma"
       },
       "stops": {
         "unjustified_stops": 7418,
@@ -218,11 +240,18 @@
           "shift": false,
           "tool_age": true
         },
+        "planted_reported": {
+          "supplier": false,
+          "days_since_pm": true,
+          "shift": false,
+          "tool_age": true
+        },
         "null_reported": {
           "operator_id": true,
           "coolant_conc": false,
           "weekday": false
-        }
+        },
+        "rule": "sigma"
       },
       "stops": {
         "unjustified_stops": 7298,
@@ -272,11 +301,18 @@
           "shift": false,
           "tool_age": true
         },
+        "planted_reported": {
+          "supplier": true,
+          "days_since_pm": true,
+          "shift": true,
+          "tool_age": true
+        },
         "null_reported": {
           "operator_id": true,
           "coolant_conc": false,
           "weekday": false
-        }
+        },
+        "rule": "sigma"
       },
       "stops": {
         "unjustified_stops": 7492,
@@ -323,11 +359,18 @@
           "shift": false,
           "tool_age": true
         },
+        "planted_reported": {
+          "supplier": true,
+          "days_since_pm": true,
+          "shift": false,
+          "tool_age": true
+        },
         "null_reported": {
           "operator_id": false,
           "coolant_conc": false,
           "weekday": false
-        }
+        },
+        "rule": "sigma"
       },
       "stops": {
         "unjustified_stops": 7485,
@@ -375,11 +418,18 @@
           "shift": false,
           "tool_age": true
         },
+        "planted_reported": {
+          "supplier": true,
+          "days_since_pm": true,
+          "shift": false,
+          "tool_age": true
+        },
         "null_reported": {
           "operator_id": false,
           "coolant_conc": false,
           "weekday": false
-        }
+        },
+        "rule": "sigma"
       },
       "stops": {
         "unjustified_stops": 7587,
@@ -427,11 +477,18 @@
           "shift": true,
           "tool_age": true
         },
+        "planted_reported": {
+          "supplier": true,
+          "days_since_pm": false,
+          "shift": true,
+          "tool_age": true
+        },
         "null_reported": {
           "operator_id": false,
           "coolant_conc": false,
           "weekday": false
-        }
+        },
+        "rule": "sigma"
       },
       "stops": {
         "unjustified_stops": 7382,
@@ -478,11 +535,18 @@
           "shift": false,
           "tool_age": true
         },
+        "planted_reported": {
+          "supplier": true,
+          "days_since_pm": true,
+          "shift": false,
+          "tool_age": true
+        },
         "null_reported": {
           "operator_id": false,
           "coolant_conc": false,
           "weekday": false
-        }
+        },
+        "rule": "sigma"
       },
       "stops": {
         "unjustified_stops": 7416,
@@ -531,11 +595,18 @@
           "shift": false,
           "tool_age": true
         },
+        "planted_reported": {
+          "supplier": true,
+          "days_since_pm": true,
+          "shift": true,
+          "tool_age": true
+        },
         "null_reported": {
           "operator_id": false,
           "coolant_conc": false,
           "weekday": false
-        }
+        },
+        "rule": "sigma"
       },
       "stops": {
         "unjustified_stops": 7442,
@@ -589,11 +660,18 @@
           "shift": false,
           "tool_age": true
         },
+        "planted_reported": {
+          "supplier": true,
+          "days_since_pm": true,
+          "shift": false,
+          "tool_age": true
+        },
         "null_reported": {
           "operator_id": false,
           "coolant_conc": false,
           "weekday": true
-        }
+        },
+        "rule": "sigma"
       },
       "stops": {
         "unjustified_stops": 23380,
@@ -646,11 +724,18 @@
           "shift": false,
           "tool_age": true
         },
+        "planted_reported": {
+          "supplier": true,
+          "days_since_pm": true,
+          "shift": false,
+          "tool_age": true
+        },
         "null_reported": {
           "operator_id": false,
           "coolant_conc": false,
           "weekday": false
-        }
+        },
+        "rule": "sigma"
       },
       "stops": {
         "unjustified_stops": 23478,
@@ -699,11 +784,18 @@
           "shift": false,
           "tool_age": true
         },
+        "planted_reported": {
+          "supplier": true,
+          "days_since_pm": true,
+          "shift": false,
+          "tool_age": true
+        },
         "null_reported": {
           "operator_id": false,
           "coolant_conc": false,
           "weekday": false
-        }
+        },
+        "rule": "sigma"
       },
       "stops": {
         "unjustified_stops": 23370,
@@ -756,11 +848,18 @@
           "shift": false,
           "tool_age": true
         },
+        "planted_reported": {
+          "supplier": true,
+          "days_since_pm": true,
+          "shift": false,
+          "tool_age": true
+        },
         "null_reported": {
           "operator_id": false,
           "coolant_conc": false,
           "weekday": false
-        }
+        },
+        "rule": "sigma"
       },
       "stops": {
         "unjustified_stops": 23169,
@@ -815,11 +914,18 @@
           "shift": false,
           "tool_age": true
         },
+        "planted_reported": {
+          "supplier": true,
+          "days_since_pm": true,
+          "shift": true,
+          "tool_age": true
+        },
         "null_reported": {
           "operator_id": false,
           "coolant_conc": false,
           "weekday": false
-        }
+        },
+        "rule": "sigma"
       },
       "stops": {
         "unjustified_stops": 23030,
@@ -872,11 +978,18 @@
           "shift": false,
           "tool_age": true
         },
+        "planted_reported": {
+          "supplier": true,
+          "days_since_pm": true,
+          "shift": false,
+          "tool_age": true
+        },
         "null_reported": {
           "operator_id": false,
           "coolant_conc": false,
           "weekday": false
-        }
+        },
+        "rule": "sigma"
       },
       "stops": {
         "unjustified_stops": 23131,
@@ -930,11 +1043,18 @@
           "shift": false,
           "tool_age": true
         },
+        "planted_reported": {
+          "supplier": true,
+          "days_since_pm": true,
+          "shift": false,
+          "tool_age": true
+        },
         "null_reported": {
           "operator_id": false,
           "coolant_conc": false,
           "weekday": false
-        }
+        },
+        "rule": "sigma"
       },
       "stops": {
         "unjustified_stops": 23448,
@@ -988,11 +1108,18 @@
           "shift": true,
           "tool_age": true
         },
+        "planted_reported": {
+          "supplier": true,
+          "days_since_pm": true,
+          "shift": true,
+          "tool_age": true
+        },
         "null_reported": {
           "operator_id": false,
           "coolant_conc": false,
           "weekday": false
-        }
+        },
+        "rule": "sigma"
       },
       "stops": {
         "unjustified_stops": 23478,
@@ -1049,11 +1176,18 @@
           "shift": false,
           "tool_age": true
         },
+        "planted_reported": {
+          "supplier": true,
+          "days_since_pm": true,
+          "shift": true,
+          "tool_age": true
+        },
         "null_reported": {
           "operator_id": true,
           "coolant_conc": false,
           "weekday": true
-        }
+        },
+        "rule": "sigma"
       },
       "stops": {
         "unjustified_stops": 23524,
@@ -1100,11 +1234,18 @@
           "shift": false,
           "tool_age": true
         },
+        "planted_reported": {
+          "supplier": true,
+          "days_since_pm": true,
+          "shift": false,
+          "tool_age": true
+        },
         "null_reported": {
           "operator_id": false,
           "coolant_conc": false,
           "weekday": false
-        }
+        },
+        "rule": "sigma"
       },
       "stops": {
         "unjustified_stops": 23350,
@@ -1143,6 +1284,25 @@
         },
         "supplier": {
           "rate": 0.9,
+          "runs": 20
+        },
+        "tool_age": {
+          "rate": 1.0,
+          "runs": 20
+        }
+      },
+      "planted_reported_mean": 0.8,
+      "per_driver_reported_rate": {
+        "days_since_pm": {
+          "rate": 0.95,
+          "runs": 20
+        },
+        "shift": {
+          "rate": 0.3,
+          "runs": 20
+        },
+        "supplier": {
+          "rate": 0.95,
           "runs": 20
         },
         "tool_age": {
@@ -1213,6 +1373,25 @@
             "runs": 10
           }
         },
+        "planted_reported_mean": 0.775,
+        "per_driver_reported_rate": {
+          "days_since_pm": {
+            "rate": 0.9,
+            "runs": 10
+          },
+          "shift": {
+            "rate": 0.3,
+            "runs": 10
+          },
+          "supplier": {
+            "rate": 0.9,
+            "runs": 10
+          },
+          "tool_age": {
+            "rate": 1.0,
+            "runs": 10
+          }
+        },
         "per_null_reported_rate": {
           "coolant_conc": {
             "rate": 0.0,
@@ -1275,6 +1454,25 @@
             "runs": 10
           }
         },
+        "planted_reported_mean": 0.825,
+        "per_driver_reported_rate": {
+          "days_since_pm": {
+            "rate": 1.0,
+            "runs": 10
+          },
+          "shift": {
+            "rate": 0.3,
+            "runs": 10
+          },
+          "supplier": {
+            "rate": 1.0,
+            "runs": 10
+          },
+          "tool_age": {
+            "rate": 1.0,
+            "runs": 10
+          }
+        },
         "per_null_reported_rate": {
           "coolant_conc": {
             "rate": 0.0,
@@ -1296,7 +1494,7 @@
         "coverage_count_min": 0.8491,
         "accuracy_count_mean": 0.9607,
         "accuracy_count_min": 0.9279,
-        "coverage_minutes_mean": 0.6743,
+        "coverage_minutes_mean": 0.6742,
         "coverage_minutes_min": 0.5157,
         "accuracy_minutes_mean": 0.6073,
         "accuracy_minutes_min": 0.5071

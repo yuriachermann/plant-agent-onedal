@@ -102,3 +102,20 @@ Host: the same 12th Gen Intel Core i5-12450H (8 cores, 12 logical processors, 63
 ## CLAUDE.md
 
 Outcome: `CLAUDE.md` holds the session rules and a one-line-per-folder map. `pytest -q`: 25 passed, 1 deselected.
+
+## 1.2 Null drivers
+
+Plan: add a shadow-feature rule to `rank_loss_drivers` beside the current one. Each feature gets a copy with its rows shuffled, the forest is fitted on features and copies, and a driver is reported only if its permutation importance is above zero and above the strongest copy's. Score both rules with `bench.evaluate` on seeds 1–10, sizes S and M. Keep the rule with fewer null reports, as long as planted drivers do not drop out. Add "planted driver reported" to the evaluation, since a rule that reports more can hide behind top-3 rates.
+
+Files: `tools/drivers.py`, `tools/common.py` (tool version 0.3.0), `bench/evaluate.py`, `tests/test_tools.py`, `results/eval/` (rerun), `results/eval/drivers-shadow/`, `results/parity.json`, `results/parity_report.md`, `README.md`, `CHANGELOG.md`, `PROGRESS.md`.
+
+Outcome: shadow rule rejected. The default is still the 2σ / 20% rule.
+
+- Current rule, `results/eval/summary.json`: nulls reported in 25% of runs (operator 20%, weekday 15%, coolant concentration 0%). Planted drivers in the top 3 71.25%, reported 80.0% (shift 30%). The rerun reproduces every per-run value of the 2026-11-07 grid. One size-M mean, stop coverage by minutes, now rounds to 0.6742 instead of 0.6743 (unrounded 0.67425).
+- Shadow rule, `results/eval/drivers-shadow/summary.json`: nulls in 55% of runs (operator 35%, weekday 30%, coolant concentration 5%). Planted drivers in the top 3 70.0%. It reports more planted drivers (90.0%, shift 65%), but it reports 5.7 of the top 6 rows per run against 4.05 for the current rule, so that is not selectivity. Days since PM in the top 3 falls from 85% to 60%, supplier from 90% to 80%. Shift rises from 10% to 40%.
+- Drift, signal health and stop results are identical between the two runs.
+- `python -m bench.parity` (tool version 0.3.0): PASS, same metrics as the baseline. The gate runs the default rule only. `pytest -q`: 26 passed, 1 deselected, in 36.71s.
+
+## Decisions needed
+
+1. **Null drivers: grouped holdout?** The shadow rule did not help because operator and weekday beat their shuffled copies in most runs. My guess, not tested: the holdout is a random split of hours, so hours from the same line, shift and day sit on both sides. Operator is drawn per line, shift and day, and weekday also marks days, so both can stand in for day-level effects such as the supplier drawn per machine and day. A holdout split by day would test this. It changes the tool's method and the slide numbers, so it is your call.

@@ -10,6 +10,16 @@ favours high-cardinality columns such as operator IDs.
 The ranking says what *goes with* losses, not what *causes* them. Shift and
 line are confounded when only one line runs a night shift; the result keeps
 both and says so.
+
+Two rules decide which ranked columns are reported as drivers:
+
+* ``sigma``: importance above 2 standard deviations of its own permutation
+  repeats and at least ``relevance`` times the top driver's importance.
+* ``shadow``: every feature also gets a shadow copy, the same column with its
+  rows shuffled, so it keeps the distribution but loses any link to the
+  target. The forest is fitted on features and shadows together, and a column
+  is reported only if its importance is above zero and above the strongest
+  shadow's.
 """
 from __future__ import annotations
 
@@ -28,6 +38,7 @@ LABEL = {"line_id": "line", "machine_type": "machine type", "shift": "shift", "s
          "program_new": "new program (first 3 days)", "tool_age": "tool age (cycles)",
          "days_since_pm": "days since preventive maintenance", "ambient_temp": "ambient temperature",
          "coolant_conc": "coolant concentration"}
+NULL_RULES = ("sigma", "shadow")
 
 
 def _effect(h: pd.DataFrame, f: str, target: str) -> dict:
@@ -45,7 +56,10 @@ def _effect(h: pd.DataFrame, f: str, target: str) -> dict:
 
 def rank_loss_drivers(plant, scope: dict | None = None, target: str = "unplanned_rate", n_estimators: int = 200,
                       max_depth: int = 10, min_samples_leaf: int = 30, n_repeats: int = 5, holdout: float = 0.25,
-                      perm_rows: int = 3000, seed: int = 0, top: int = 6, relevance: float = 0.20) -> dict:
+                      perm_rows: int = 3000, seed: int = 0, top: int = 6, relevance: float = 0.20,
+                      null_rule: str = "sigma") -> dict:
+    if null_rule not in NULL_RULES:
+        raise ValueError(f"rank_loss_drivers: null_rule must be one of {NULL_RULES}")
     est = B.estimators()
     T = Timer()
     with T.phase("prep"):
@@ -68,9 +82,15 @@ def rank_loss_drivers(plant, scope: dict | None = None, target: str = "unplanned
             *[h[c].to_numpy(np.float64) for c in nums],
         ]).astype(np.float64)
         y = h[target].to_numpy(np.float64)
+        n_feat = X.shape[1]
+        Xm = X
+        if null_rule == "shadow":
+            # own random stream, so the holdout split and permutation sample match the sigma rule's
+            srng = np.random.default_rng([seed, 1])
+            Xm = np.hstack([X, np.column_stack([srng.permutation(X[:, j]) for j in range(n_feat)])])
         rng = np.random.default_rng(seed)
         te = rng.random(len(y)) < holdout
-        Xtr, ytr, Xte, yte = (np.ascontiguousarray(a) for a in (X[~te], y[~te], X[te], y[te]))
+        Xtr, ytr, Xte, yte = (np.ascontiguousarray(a) for a in (Xm[~te], y[~te], Xm[te], y[te]))
         # permutation importance on a fixed-size sample of the holdout keeps the cost flat as plants grow
         pr = np.sort(rng.permutation(len(yte))[:perm_rows])
         Xp, yp = np.ascontiguousarray(Xte[pr]), yte[pr]
@@ -81,18 +101,25 @@ def rank_loss_drivers(plant, scope: dict | None = None, target: str = "unplanned
         r2 = float(rf.score(Xte, yte))
         pi = permutation_importance(rf, Xp, yp, n_repeats=n_repeats, random_state=seed, n_jobs=1)
     with T.phase("post"):
-        order = np.argsort(-pi.importances_mean, kind="stable")
+        imp_mean, imp_std = pi.importances_mean[:n_feat], pi.importances_std[:n_feat]
+        shadow_max = float(pi.importances_mean[n_feat:].max()) if null_rule == "shadow" else None
+        order = np.argsort(-imp_mean, kind="stable")
         used = cats + nums
         ranking, facts = [], {}
         for rank, j in enumerate(order, 1):
             f = used[j]
             ranking.append({"rank": rank, "driver": f, "label": LABEL[f],
-                            "importance": round(float(pi.importances_mean[j]), 4),
-                            "importance_std": round(float(pi.importances_std[j]), 4)})
+                            "importance": round(float(imp_mean[j]), 4),
+                            "importance_std": round(float(imp_std[j]), 4)})
         best = max(ranking[0]["importance"], 1e-12)
-        for item in ranking[:top]:
-            # reported only if clearly above permutation noise AND a meaningful fraction of the top driver
-            item["reported"] = bool(item["importance"] > 2 * item["importance_std"] and item["importance"] >= relevance * best)
+        for item, j in zip(ranking[:top], order[:top]):
+            if null_rule == "shadow":
+                # reported only if shuffling it hurts more than shuffling any shadow column
+                item["reported"] = bool(imp_mean[j] > max(shadow_max, 0.0))
+            else:
+                # reported only if clearly above permutation noise AND a meaningful fraction of the top driver
+                item["reported"] = bool(item["importance"] > 2 * item["importance_std"]
+                                        and item["importance"] >= relevance * best)
             if not item["reported"]:
                 continue
             e = _effect(h, item["driver"], target)
@@ -113,16 +140,22 @@ def rank_loss_drivers(plant, scope: dict | None = None, target: str = "unplanned
             "holdout_r2": round(r2, 4), "ranking": ranking, "caveats": conf,
             "missing_features": missing,
             "target_hours_total": round(float(y.sum()) / 60, 1),
+            "null_rule": null_rule,
         }
+        if null_rule == "shadow":
+            result["shadow_max_importance"] = round(shadow_max, 4)
         what = {"unplanned_rate": "unplanned stop minutes per available hour",  # noqa: E501
                 "unplanned_minutes": "unplanned stop minutes"}.get(target, target.replace("_", " "))
         facts["M"] = (f"Model of {what} on {len(y)} machine-hours over {d1 - d0 + 1} days; holdout R² {r2:.2f}. "
                       "Rankings show association, not cause." + (" " + conf[0] if conf else ""))
+        if null_rule == "shadow":
+            facts["M"] += (f" A driver is reported only if it beats the strongest of {n_feat} shuffled copies of the "
+                           f"features (importance {shadow_max:.3f}).")
         if missing:
             facts["M"] += " Missing features, left out rather than filled in: " + ", ".join(missing) + "."
     params = {"target": target, "n_estimators": n_estimators, "max_depth": max_depth,
               "min_samples_leaf": min_samples_leaf, "n_repeats": n_repeats, "holdout": holdout,
-              "perm_rows": perm_rows, "relevance": relevance,
+              "perm_rows": perm_rows, "relevance": relevance, "null_rule": null_rule,
               "seed": seed, "features": cats + nums, "missing_features": missing}
     return envelope("rank_loss_drivers", scope, params, fingerprint(y, X[:, -3]), result, facts, T,
-                    extra={"_importances": pi.importances_mean})
+                    extra={"_importances": imp_mean})

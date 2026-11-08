@@ -12,3 +12,14 @@
 - Recorded a signal_health thread-pool probe on this 12-thread laptop. The Xeon slowdown did not appear, and no tool change was made. See `docs/findings/signal-health-slowdown.md`.
 - DBSCAN `eps` / `min_samples` left unchanged. Across seeds 1–10 the irregular share stays inside a 2-point band per scope. See `docs/findings/dbscan-heuristic.md`.
 - `CLAUDE.md` holds the working rules and a repo map for later sessions.
+- Null drivers (tool version 0.3.0): `rank_loss_drivers` keeps its reporting rule (above 2σ of permutation noise and at least 20% of the top driver). A shadow-feature rule was tried and rejected: shuffled copies of every feature are fitted with the forest, and a driver is reported only if it beats the strongest copy. It stays available as `null_rule="shadow"`, off by default. `bench.evaluate --drivers-rule` picks the rule and now also reports how often each planted driver is reported. Seeds 1–10, sizes S and M, stock:
+
+  | | 2σ / 20% rule (kept) | Shadow rule |
+  |---|---:|---:|
+  | Runs with any null driver reported | 25% | 55% |
+  | operator / weekday / coolant concentration reported | 20% / 15% / 0% | 35% / 30% / 5% |
+  | Planted drivers in the top 3 | 71.25% | 70.0% |
+  | tool age / supplier / days since PM / shift in the top 3 | 100% / 90% / 85% / 10% | 100% / 80% / 60% / 40% |
+  | Planted drivers reported | 80.0% | 90.0% |
+
+  Sources: `results/eval/summary.json` and `results/eval/drivers-shadow/summary.json`.

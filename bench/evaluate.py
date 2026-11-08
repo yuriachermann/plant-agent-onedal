@@ -9,14 +9,17 @@ the rates below.
   false positive.
 * Signal health: recall on coolant faults, and the share of healthy machines
   that are flagged. Healthy means no wear, step, or coolant fault.
-* Drivers: how often each planted driver is in the top 3 by importance, and
-  how often a null driver is reported (above the tool's own reporting rule).
+* Drivers: how often each planted driver is in the top 3 by importance, how
+  often each planted driver is reported, and how often a null driver is
+  reported (both by the tool's own reporting rule; ``--drivers-rule`` picks
+  which one).
 * Stops: suggestion coverage and accuracy on unjustified stops, by count and
   by minutes. Accuracy is among the stops that received a suggestion.
   Minute weights are stop durations.
 
     python -m bench.evaluate
     python -m bench.evaluate --seeds 1 --sizes S --out results/_eval_smoke
+    python -m bench.evaluate --drivers-rule shadow --out results/eval/drivers-shadow
 """
 from __future__ import annotations
 
@@ -32,6 +35,7 @@ sys.path.insert(0, str(REPO))
 
 from plantgen import generate_plant  # noqa: E402
 from tools import TOOLS, set_backend  # noqa: E402
+from tools.drivers import NULL_RULES  # noqa: E402
 
 
 def _rate(num: int, den: int) -> float | None:
@@ -78,7 +82,9 @@ def _drivers(plant, env) -> dict:
         "top3": top3,
         "reported": reported,
         "planted_in_top3": {d: d in top3 for d in planted},
+        "planted_reported": {d: d in reported for d in planted},
         "null_reported": {d: d in reported for d in nulls},
+        "rule": env["result"].get("null_rule"),
     }
 
 
@@ -102,11 +108,12 @@ def _stops(plant, env) -> dict:
     }
 
 
-def score_plant(plant, backend: str = "stock") -> dict:
+def score_plant(plant, backend: str = "stock", drivers_rule: str | None = None) -> dict:
     set_backend(backend)
     drift = _drift(plant, TOOLS["detect_cycle_drift"](plant, None))
     health = _health(plant, TOOLS["signal_health"](plant, None))
-    drivers = _drivers(plant, TOOLS["rank_loss_drivers"](plant, None))
+    dparams = {"null_rule": drivers_rule} if drivers_rule else {}
+    drivers = _drivers(plant, TOOLS["rank_loss_drivers"](plant, None, **dparams))
     stops = _stops(plant, TOOLS["cluster_stops"](plant, None))
     return {"drift": drift, "signal_health": health, "drivers": drivers, "stops": stops}
 
@@ -142,16 +149,19 @@ def aggregate(runs: list[dict]) -> dict:
 
     planted = sorted({d for run in runs for d in run["drivers"]["planted_in_top3"]})
     nulls = sorted({d for run in runs for d in run["drivers"]["null_reported"]})
-    planted_rates = {}
+    planted_rates, planted_reported = {}, {}
     for d in planted:
         hits = [1.0 if run["drivers"]["planted_in_top3"][d] else 0.0 for run in runs]
         planted_rates[d] = {"rate": _round(_mean(hits)), "runs": len(hits)}
+        rep = [1.0 if run["drivers"]["planted_reported"][d] else 0.0 for run in runs]
+        planted_reported[d] = {"rate": _round(_mean(rep)), "runs": len(rep)}
     null_rates = {}
     for d in nulls:
         hits = [1.0 if run["drivers"]["null_reported"][d] else 0.0 for run in runs]
         null_rates[d] = {"rate": _round(_mean(hits)), "runs": len(hits)}
     any_null = [1.0 if any(run["drivers"]["null_reported"].values()) else 0.0 for run in runs]
     in_top3 = [np.mean(list(run["drivers"]["planted_in_top3"].values())) for run in runs]
+    reported = [np.mean(list(run["drivers"]["planted_reported"].values())) for run in runs]
     return {
         "n_runs": len(runs),
         "drift": {
@@ -170,6 +180,8 @@ def aggregate(runs: list[dict]) -> dict:
             "planted_in_top3_mean": _round(_mean(in_top3)),
             "planted_in_top3_min": _round(_min(in_top3)),
             "per_driver_top3_rate": planted_rates,
+            "planted_reported_mean": _round(_mean(reported)),
+            "per_driver_reported_rate": planted_reported,
             "per_null_reported_rate": null_rates,
             "any_null_reported_rate": _round(_mean(any_null)),
         },
@@ -197,7 +209,8 @@ def render_md(summary: dict) -> str:
         "# Detection quality against planted truth",
         "",
         f"Backend `{summary['backend']}`, seeds {summary['seeds']}, sizes {summary['sizes']}, "
-        f"{summary['aggregate']['n_runs']} plants. Definitions are in `summary.json`.",
+        f"{summary['aggregate']['n_runs']} plants, driver rule `{summary.get('drivers_rule')}`. "
+        "Definitions are in `summary.json`.",
         "",
         "## Drift (wear + step)",
         "",
@@ -216,13 +229,15 @@ def render_md(summary: dict) -> str:
         "",
         f"Share of planted drivers in the top 3: mean {_pct(agg['drivers']['planted_in_top3_mean'])} "
         f"(min {_pct(agg['drivers']['planted_in_top3_min'])}). "
+        f"Share of planted drivers reported: mean {_pct(agg['drivers']['planted_reported_mean'])}. "
         f"Runs with any null driver reported: {_pct(agg['drivers']['any_null_reported_rate'])}.",
         "",
-        "| Planted driver | Share of runs in the top 3 |",
-        "|---|---:|",
+        "| Planted driver | Share of runs in the top 3 | Share of runs reported |",
+        "|---|---:|---:|",
     ]
     for name, rec in agg["drivers"]["per_driver_top3_rate"].items():
-        lines.append(f"| {name} | {_pct(rec['rate'])} |")
+        rep = agg["drivers"]["per_driver_reported_rate"][name]["rate"]
+        lines.append(f"| {name} | {_pct(rec['rate'])} | {_pct(rep)} |")
     lines += ["", "| Null driver | Share of runs reported |", "|---|---:|"]
     for name, rec in agg["drivers"]["per_null_reported_rate"].items():
         lines.append(f"| {name} | {_pct(rec['rate'])} |")
@@ -256,12 +271,12 @@ def render_md(summary: dict) -> str:
     return "\n".join(lines)
 
 
-def run(seeds: list[int], sizes: list[str], backend: str, out: Path) -> dict:
+def run(seeds: list[int], sizes: list[str], backend: str, out: Path, drivers_rule: str | None = None) -> dict:
     runs = []
     for size in sizes:
         for seed in seeds:
             plant = generate_plant(size, seed=seed)
-            scored = score_plant(plant, backend)
+            scored = score_plant(plant, backend, drivers_rule)
             runs.append({"size": size, "seed": seed, "plant_id": plant.plant_id, **scored})
             d, h, s = scored["drift"], scored["signal_health"], scored["stops"]
             print(
@@ -274,11 +289,12 @@ def run(seeds: list[int], sizes: list[str], backend: str, out: Path) -> dict:
         "backend": backend,
         "seeds": seeds,
         "sizes": sizes,
+        "drivers_rule": runs[0]["drivers"]["rule"] if runs else drivers_rule,
         "definitions": {
             "drift_positive": "drift_wear ∪ drift_step. Other flagged machines, including coolant faults, are false positives.",
             "signal_health_healthy": "Machines with no wear, step, or coolant fault.",
             "drivers_top3": "First three rows of ranking, ordered by permutation importance.",
-            "drivers_reported": "ranking[].reported, the tool's own threshold.",
+            "drivers_reported": "ranking[].reported, the tool's own rule (drivers_rule).",
             "stops_unjustified": "reason_reported is blank.",
             "stops_accuracy": "suggested reason equals reason_true, among unjustified stops that got a suggestion.",
             "stops_minutes": "Weighted by duration_s.",
@@ -320,9 +336,11 @@ def main(argv=None):
     ap.add_argument("--seeds", nargs="+", type=int, default=list(range(1, 11)))
     ap.add_argument("--sizes", nargs="+", default=["S", "M"])
     ap.add_argument("--backend", choices=["stock", "onedal"], default="stock")
+    ap.add_argument("--drivers-rule", choices=list(NULL_RULES), default=None,
+                    help="rank_loss_drivers reporting rule; default is the tool's own default")
     ap.add_argument("--out", default=str(REPO / "results" / "eval"))
     args = ap.parse_args(argv)
-    run(args.seeds, args.sizes, args.backend, Path(args.out))
+    run(args.seeds, args.sizes, args.backend, Path(args.out), args.drivers_rule)
     return 0
 
 
