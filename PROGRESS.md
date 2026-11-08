@@ -90,3 +90,11 @@ Plan: run the current `eps` / `min_samples` rule on seeds 1–10, sizes S and M,
 Files: `bench/probe_dbscan.py`, `results/findings/dbscan-heuristic.json`, `docs/findings/dbscan-heuristic.md`, `CHANGELOG.md`, `PROGRESS.md`.
 
 Outcome: no change. Irregular share within a scope spans less than 2 points (plant M 24.1–25.0%, line scopes about 10.6–12.2%). Count accuracy stays at or above 92.8%. Plant M is on the eps floor 0.5 with `min_samples` 30. Minute-weighted accuracy still spans roughly 50–80%, which matches the evaluation grid and is not an eps jump. Table: `docs/findings/dbscan-heuristic.md`.
+
+## Session baseline, 2026-11-08
+
+Host: the same 12th Gen Intel Core i5-12450H (8 cores, 12 logical processors, 63.7 GiB RAM), Windows 11, Python 3.12.2 from the main checkout's `.venv`. Power plan "High performance", on AC power. scikit-learn 1.9.1, scikit-learn-intelex 2026.2.0, tool version 0.2.0. Start commit `87f4959`.
+
+- `ruff check .`: all checks passed.
+- `pytest -q`: 25 passed, 1 deselected, in 46.33s.
+- `python -m bench.parity`: PASS in 45.7s wall. Metrics unchanged from the record in `results/parity.json`: ARI 1.0 and noise agreement 1.0 on both scopes, drift flags M003, M006, M022, M028 with max share difference 0.0, drivers top 3 tool_age, supplier, days_since_pm with Spearman 0.9301 (plant) and 0.8807 (line) and ΔR² 0.0017 and 0.007, signal_health flags M002, M003, M006, M020, M022, M028 with max share difference 0.0. Only `checked_at` changed, so the rewritten `results/parity.json` and `results/parity_report.md` were restored.
