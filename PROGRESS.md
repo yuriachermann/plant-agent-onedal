@@ -131,8 +131,24 @@ Outcome: merged.
 - `python -m bench.parity` (tool version 0.4.0): PASS. Drift now flags M003, M006, M018, M022, M028 and M040 on plant M seed 7 with both backends (max share difference 0.0). The other tools have the same metrics as before. `pytest -q`: 27 passed. `python -m demo.agent_demo --size M --backend onedal --line L1`: citation check passed with the new step-test sentences.
 - During this task the laptop went from AC to battery. That changes timings only; the evaluation is deterministic.
 
+## Stock gap, laptop vs Xeon (prompt task 4)
+
+Plan: rerun the 0.5 command, then probe one factor at a time in fresh processes: `n_jobs` forced to 1 or 2, native pools at 1 thread, the process pinned to P-cores or E-cores, and an EcoQoS opt-out. Also time single-thread calibration loops on one P-core and one E-core, per-call estimator cost, and the stock 1-thread kernel sweep. Record the power plan and AC state. Change the tools only with a fix that treats both backends the same.
+
+Files: `bench/probe_stock_gap.py`, `bench/run_bench.py` and `bench/report.py` (power state), `tests/test_platform.py`, `results/findings/stock-gap-battery.json`, `results/findings/stock-gap-ecoqos-battery.json`, `results/findings/stock-gap-bench-battery/`, `docs/findings/stock-gap.md`, `README.md`, `CHANGELOG.md`, `PROGRESS.md`.
+
+Outcome: explained, no tool change. Everything ran on battery: the laptop was on AC at the session baseline and was unplugged before this task.
+
+- The 0.5 command, plant M, gives 6,011 ms stock and 983 ms oneDAL (6.12×), against 11,500 and 1,721 ms in 0.5 (`results/findings/stock-gap-bench-battery/summary.json`). Both backends were slower on every tool in 0.5, so that run was a machine-state outlier, and its power state was not recorded.
+- The remaining gap to the Xeon (4,104 / 1,026 ms, 4.0×) comes from stock: `n_jobs=-1` starts 12 workers on every small kNN query and forest predict. Forcing `n_jobs=1` takes the stock answer from 5,939 to 3,854 ms and oneDAL from 1,288 to 2,288 ms (`results/findings/stock-gap-battery.json`), so it is not a fair fix.
+- Native pools at 1 thread: stock 6,057 ms, so OpenBLAS and OpenMP are not the cause. EcoQoS opt-out: 5,603 / 852 ms against 5,525 / 817 ms default in the same probe (`results/findings/stock-gap-ecoqos-battery.json`).
+- A single-thread loop runs 1.9× slower on an E-core than on a P-core. Unpinned runs landed on either kind: the oneDAL answer was 1,288 ms in one probe and 817 ms in the next.
+- `pytest -q`: 28 passed (the uncommitted MCP test skipped). No change under `tools/`, so no parity run was needed.
+
 ## Decisions needed
 
 1. **Null drivers: grouped holdout?** The shadow rule did not help because operator and weekday beat their shuffled copies in most runs. My guess, not tested: the holdout is a random split of hours, so hours from the same line, shift and day sit on both sides. Operator is drawn per line, shift and day, and weekday also marks days, so both can stand in for day-level effects such as the supplier drawn per machine and day. A holdout split by day would test this. It changes the tool's method and the slide numbers, so it is your call.
 2. **Re-run the Xeon reference before the talk?** `results/intel-xeon-2t/` was measured with tool version 0.2.0. Version 0.4.0 adds the drift step test (more post-processing per call), and the slide plant (M seed 7) now reports 6 drifting machines instead of 4. The deck's timing table and any drift screenshot should come from a fresh `python -m bench.run_bench` on the Xeon.
 3. **`main` is not fast-forwarded past the null-driver commit.** The main checkout has an uncommitted edit to `results/parity_report.md` (the `·` separators re-encoded and a blank line added before the JSON fence, which looks like an editor saving it). The parity runs in this session rewrite that file, so `git merge --ff-only` refuses. I did not touch your working copy. To bring `main` up to this branch: `git -C <main checkout> checkout -- results/parity_report.md`, then `git -C <main checkout> merge --ff-only claude/plant-agent-onedal-devsummit-354b94`.
+4. **AC rerun of the stock-gap probe.** All task-4 timings ran on battery. Plug in and run `python -m bench.probe_stock_gap --repeats 3 --out results/findings/stock-gap-ac.json` and `python -m bench.run_bench --sizes M --repeats 3 --skip-kernels --out results/findings/stock-gap-bench-ac` to separate battery from the rest. I did not change any power setting.
+5. **Edge run (plan 0.8) still open.** This machine is the i5-12450H laptop, not the Intel Core Ultra 5 NUC, so prompt task 5 was skipped.

@@ -24,3 +24,12 @@ def test_demo_color_on_a_tty(monkeypatch):
     assert color(BOLD) == BOLD
     monkeypatch.setenv("NO_COLOR", "1")
     assert color(BOLD) == ""
+
+
+def test_machine_info_records_power_on_windows():
+    info = machine_info()
+    if sys.platform != "win32":
+        assert "ac_power" not in info
+        return
+    assert info["ac_power"] in (True, False, None)
+    assert "power_plan" in info

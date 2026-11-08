@@ -1,0 +1,132 @@
+{
+  "machine": {
+    "cpu": "12th Gen Intel(R) Core(TM) i5-12450H",
+    "logical_cpus": 12,
+    "isa": [],
+    "mem_gb": 63.7,
+    "os": "Windows 11",
+    "python": "3.12.2"
+  },
+  "versions": {
+    "stock": {
+      "backend": "stock",
+      "sklearn": "1.9.1"
+    },
+    "onedal": {
+      "backend": "onedal",
+      "sklearn": "1.9.1",
+      "sklearnex": "2026.2.0",
+      "onedal": "2026.2.0"
+    }
+  },
+  "assumptions": {
+    "questions_per_day": 40,
+    "usd_per_core_hour": 0.04
+  },
+  "sizes": {
+    "M": {
+      "plant": {
+        "plant_id": "plant-40m-s7",
+        "machines": 40,
+        "days": 30,
+        "stops": 41991,
+        "cycles": 303420,
+        "machine_hours": 16720,
+        "stops_per_day": 1615.0,
+        "cycles_per_day": 11670.0
+      },
+      "on_demand": {
+        "cluster_stops": {
+          "stock_ms": 118.85,
+          "onedal_ms": 45.87,
+          "speedup": 2.59,
+          "ml_speedup": 6.33,
+          "onedal_path": "onedal-brute",
+          "stock_p50_ms": 118.85,
+          "stock_p90_ms": 121.57,
+          "onedal_p50_ms": 45.87,
+          "onedal_p90_ms": 48.5
+        },
+        "detect_cycle_drift": {
+          "stock_ms": 1923.26,
+          "onedal_ms": 464.8,
+          "speedup": 4.14,
+          "ml_speedup": 6.26,
+          "onedal_path": null,
+          "stock_p50_ms": 1923.26,
+          "stock_p90_ms": 1952.13,
+          "onedal_p50_ms": 464.8,
+          "onedal_p90_ms": 483.4
+        },
+        "rank_loss_drivers": {
+          "stock_ms": 3749.75,
+          "onedal_ms": 313.55,
+          "speedup": 11.96,
+          "ml_speedup": 12.5,
+          "onedal_path": null,
+          "stock_p50_ms": 3749.75,
+          "stock_p90_ms": 3800.18,
+          "onedal_p50_ms": 313.55,
+          "onedal_p90_ms": 340.31
+        },
+        "signal_health": {
+          "stock_ms": 218.96,
+          "onedal_ms": 158.5,
+          "speedup": 1.38,
+          "ml_speedup": 1.39,
+          "onedal_path": null,
+          "stock_p50_ms": 218.96,
+          "stock_p90_ms": 244.27,
+          "onedal_p50_ms": 158.5,
+          "onedal_p90_ms": 158.71
+        }
+      },
+      "nightly": {
+        "cold": {
+          "stock_s": 15.14,
+          "onedal_s": 4.13,
+          "speedup": 3.67
+        },
+        "warm": {
+          "stock_s": 17.05,
+          "onedal_s": 7.53,
+          "speedup": 2.26
+        },
+        "tools": {
+          "cluster_stops": {
+            "stock_s": 1.77,
+            "onedal_s": 2.35,
+            "speedup": 0.75
+          },
+          "detect_cycle_drift": {
+            "stock_s": 8.63,
+            "onedal_s": 2.98,
+            "speedup": 2.9
+          },
+          "rank_loss_drivers": {
+            "stock_s": 5.75,
+            "onedal_s": 1.11,
+            "speedup": 5.18
+          },
+          "signal_health": {
+            "stock_s": 0.9,
+            "onedal_s": 1.1,
+            "speedup": 0.82
+          }
+        }
+      },
+      "answer": {
+        "stock_ms": 6010.8,
+        "onedal_ms": 982.7,
+        "speedup": 6.12
+      },
+      "daily_cpu": {
+        "stock_core_s": 559.4,
+        "onedal_core_s": 166.1,
+        "ratio": 3.37,
+        "stock_usd": 0.0062,
+        "onedal_usd": 0.0018
+      }
+    }
+  }
+}

@@ -1,0 +1,207 @@
+{
+  "backend": "stock",
+  "versions": {
+    "backend": "stock",
+    "sklearn": "1.9.1"
+  },
+  "machine": {
+    "cpu": "12th Gen Intel(R) Core(TM) i5-12450H",
+    "logical_cpus": 12,
+    "isa": [],
+    "mem_gb": 63.7,
+    "os": "Windows 11",
+    "python": "3.12.2"
+  },
+  "seed": 7,
+  "seeds": [
+    7
+  ],
+  "repeats": 3,
+  "import_ms": 2409.2,
+  "sizes": {
+    "M": {
+      "plant": {
+        "plant_id": "plant-40m-s7",
+        "machines": 40,
+        "days": 30,
+        "stops": 41991,
+        "cycles": 303420,
+        "machine_hours": 16720,
+        "stops_per_day": 1615.0,
+        "cycles_per_day": 11670.0
+      },
+      "nightly": {
+        "cold": {
+          "wall_ms": 15136.6,
+          "cpu_ms": 47562.5,
+          "tools": {
+            "cluster_stops": {
+              "wall_ms": 1706.0,
+              "cpu_ms": 14515.6,
+              "phases_ms": {
+                "prep": 24.39,
+                "init": 27.35,
+                "ml_kmeans": 62.86,
+                "ml_dbscan": 1556.0,
+                "post": 33.05,
+                "total": 1703.65
+              },
+              "dbscan_path": "stock-tree"
+            },
+            "detect_cycle_drift": {
+              "wall_ms": 7880.3,
+              "cpu_ms": 20296.9,
+              "phases_ms": {
+                "prep": 344.98,
+                "ml_knn": 7008.86,
+                "post": 493.64,
+                "total": 7847.48
+              }
+            },
+            "rank_loss_drivers": {
+              "wall_ms": 4746.1,
+              "cpu_ms": 11968.8,
+              "phases_ms": {
+                "prep": 28.23,
+                "ml_rf_fit": 574.16,
+                "ml_rf_permutation": 4131.7,
+                "post": 9.91,
+                "total": 4744.0
+              }
+            },
+            "signal_health": {
+              "wall_ms": 804.2,
+              "cpu_ms": 781.2,
+              "phases_ms": {
+                "prep": 300.98,
+                "ml_pca": 294.81,
+                "post": 190.01,
+                "total": 785.8
+              }
+            }
+          }
+        },
+        "warm": {
+          "wall_ms": 17050.6,
+          "cpu_ms": 52484.4,
+          "tools": {
+            "cluster_stops": {
+              "wall_ms": 1771.1,
+              "cpu_ms": 15109.4,
+              "phases_ms": {
+                "prep": 20.61,
+                "init": 21.3,
+                "ml_kmeans": 25.0,
+                "ml_dbscan": 1643.14,
+                "post": 58.47,
+                "total": 1768.53
+              },
+              "dbscan_path": "stock-tree"
+            },
+            "detect_cycle_drift": {
+              "wall_ms": 8631.1,
+              "cpu_ms": 22468.8,
+              "phases_ms": {
+                "prep": 394.22,
+                "ml_knn": 7714.28,
+                "post": 502.14,
+                "total": 8610.64
+              }
+            },
+            "rank_loss_drivers": {
+              "wall_ms": 5747.4,
+              "cpu_ms": 14140.6,
+              "phases_ms": {
+                "prep": 20.05,
+                "ml_rf_fit": 645.67,
+                "ml_rf_permutation": 5065.35,
+                "post": 14.18,
+                "total": 5745.26
+              }
+            },
+            "signal_health": {
+              "wall_ms": 900.8,
+              "cpu_ms": 765.6,
+              "phases_ms": {
+                "prep": 357.89,
+                "ml_pca": 348.29,
+                "post": 180.55,
+                "total": 886.73
+              }
+            }
+          }
+        },
+        "all_wall_ms": [
+          15136.6,
+          15752.2,
+          17050.6
+        ]
+      },
+      "on_demand": {
+        "cluster_stops": {
+          "scope": {
+            "line_id": "L3",
+            "day_from": 23
+          },
+          "median_ms": 118.85,
+          "p50_ms": 118.85,
+          "p90_ms": 121.57,
+          "n_calls": 3,
+          "min_ms": 103.38,
+          "max_ms": 122.25,
+          "ml_median_ms": 68.89,
+          "cpu_median_ms": 859.38,
+          "rows": 2645,
+          "dbscan_path": "stock-tree"
+        },
+        "detect_cycle_drift": {
+          "scope": {
+            "line_id": "L3"
+          },
+          "median_ms": 1923.26,
+          "p50_ms": 1923.26,
+          "p90_ms": 1952.13,
+          "n_calls": 3,
+          "min_ms": 1877.53,
+          "max_ms": 1959.34,
+          "ml_median_ms": 1730.59,
+          "cpu_median_ms": 6406.25,
+          "rows": 25,
+          "dbscan_path": null
+        },
+        "rank_loss_drivers": {
+          "scope": {
+            "line_id": "L3"
+          },
+          "median_ms": 3749.75,
+          "p50_ms": 3749.75,
+          "p90_ms": 3800.18,
+          "n_calls": 3,
+          "min_ms": 3653.94,
+          "max_ms": 3812.79,
+          "ml_median_ms": 3736.33,
+          "cpu_median_ms": 5218.75,
+          "rows": 4201,
+          "dbscan_path": null
+        },
+        "signal_health": {
+          "scope": {
+            "line_id": "L3"
+          },
+          "median_ms": 218.96,
+          "p50_ms": 218.96,
+          "p90_ms": 244.27,
+          "n_calls": 3,
+          "min_ms": 165.46,
+          "max_ms": 250.59,
+          "ml_median_ms": 85.75,
+          "cpu_median_ms": 187.5,
+          "rows": 25,
+          "dbscan_path": null
+        }
+      },
+      "answer_ms": 6010.8,
+      "answer_cpu_ms": 12671.9
+    }
+  }
+}

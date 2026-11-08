@@ -62,13 +62,35 @@ def _windows_cpu_mem() -> tuple[str, float | None]:
     return cpu, mem
 
 
+def _windows_power() -> dict:
+    """AC or battery, and the active power plan. Laptop timings move with both (docs/findings/stock-gap.md)."""
+    out = {"ac_power": None, "power_plan": None}
+    try:
+        ac = subprocess.run(
+            ["powershell", "-NoProfile", "-Command",
+             "(Get-CimInstance -Namespace root/wmi -ClassName BatteryStatus -ErrorAction SilentlyContinue"
+             " | Select-Object -First 1).PowerOnline"],
+            capture_output=True, text=True, timeout=20, check=False).stdout.strip()
+        plan = subprocess.run(["powercfg", "/getactivescheme"], capture_output=True, text=True, timeout=20,
+                              check=False).stdout
+    except (OSError, subprocess.TimeoutExpired):
+        return out
+    # no battery (desktop, server) reports nothing: that is mains power
+    out["ac_power"] = {"True": True, "False": False}.get(ac, True if ac == "" else None)
+    m = re.search(r"\(([^)]+)\)\s*$", plan.strip())
+    out["power_plan"] = m.group(1) if m else None
+    return out
+
+
 def machine_info() -> dict:
     cpu = platform.processor() or ""
     isa: list[str] = []
     mem_gb = None
+    power: dict = {}
     if platform.system() == "Windows":
         wcpu, mem_gb = _windows_cpu_mem()
         cpu = wcpu or cpu
+        power = _windows_power()
     else:
         try:
             txt = Path("/proc/cpuinfo").read_text()
@@ -83,7 +105,7 @@ def machine_info() -> dict:
         except (OSError, AttributeError, ValueError):
             pass
     return {"cpu": cpu, "logical_cpus": os.cpu_count(), "isa": isa, "mem_gb": mem_gb,
-            "os": f"{platform.system()} {platform.release()}", "python": platform.python_version()}
+            "os": f"{platform.system()} {platform.release()}", "python": platform.python_version(), **power}
 
 
 def machine_tag(info: dict) -> str:

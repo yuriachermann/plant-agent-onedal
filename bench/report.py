@@ -16,6 +16,15 @@ KERNEL_ORDER = ("dbscan", "kmeans", "knn", "rf_fit", "rf_predict", "pca")
 _THREAD_FILE = re.compile(r"kernels_(stock|onedal)_t(all|\d+)\.json$")
 
 
+
+def _power(machine: dict) -> str:
+    """AC or battery and the power plan, when the bench recorded them (Windows runs from 2026-11-08 on)."""
+    if "ac_power" not in machine:
+        return ""
+    ac = {True: "on AC", False: "on battery", None: "power source unknown"}[machine["ac_power"]]
+    plan = f", plan {machine['power_plan']}" if machine.get("power_plan") else ""
+    return f" · {ac}{plan}"
+
 def spread(block: dict) -> str:
     """p50–p90 in milliseconds. Missing keys (older bench JSON) print as n/a."""
     if block.get("p90_ms") is None:
@@ -96,7 +105,7 @@ def main(argv=None):
     pooled = f" pooled across {len(seeds)} seeds" if len(seeds) > 1 else ""
     md = ["# Benchmark: stock scikit-learn vs oneDAL", "",
           f"**Machine:** {s['machine']['cpu']} · {s['machine']['logical_cpus']} logical CPUs · ISA {', '.join(s['machine']['isa']) or 'n/a'}"
-          f" · {s['machine']['os']} · Python {s['machine']['python']}",
+          f" · {s['machine']['os']} · Python {s['machine']['python']}" + _power(s["machine"]),
           f"**Versions:** scikit-learn {s['versions']['sklearn']} · scikit-learn-intelex {o['versions'].get('sklearnex')}"
           f" · oneDAL {o['versions'].get('onedal', '?')}", "",
           f"Synthetic plants, 30 days, {seed_txt}. On-demand = one line, median of {s['repeats']} warm calls{pooled}. "
