@@ -17,6 +17,7 @@
     "M"
   ],
   "drivers_rule": "sigma",
+  "drivers_holdout": "hour",
   "drift_step_test": true,
   "definitions": {
     "drift_positive": "drift_wear \u222a drift_step. Other flagged machines, including coolant faults, are false positives.",
@@ -97,7 +98,8 @@
           "coolant_conc": false,
           "weekday": false
         },
-        "rule": "sigma"
+        "rule": "sigma",
+        "holdout_by": "hour"
       },
       "stops": {
         "unjustified_stops": 7350,
@@ -173,7 +175,8 @@
           "coolant_conc": false,
           "weekday": false
         },
-        "rule": "sigma"
+        "rule": "sigma",
+        "holdout_by": "hour"
       },
       "stops": {
         "unjustified_stops": 7538,
@@ -252,7 +255,8 @@
           "coolant_conc": false,
           "weekday": true
         },
-        "rule": "sigma"
+        "rule": "sigma",
+        "holdout_by": "hour"
       },
       "stops": {
         "unjustified_stops": 7418,
@@ -325,7 +329,8 @@
           "coolant_conc": false,
           "weekday": false
         },
-        "rule": "sigma"
+        "rule": "sigma",
+        "holdout_by": "hour"
       },
       "stops": {
         "unjustified_stops": 7298,
@@ -404,7 +409,8 @@
           "coolant_conc": false,
           "weekday": false
         },
-        "rule": "sigma"
+        "rule": "sigma",
+        "holdout_by": "hour"
       },
       "stops": {
         "unjustified_stops": 7492,
@@ -479,7 +485,8 @@
           "coolant_conc": false,
           "weekday": false
         },
-        "rule": "sigma"
+        "rule": "sigma",
+        "holdout_by": "hour"
       },
       "stops": {
         "unjustified_stops": 7485,
@@ -556,7 +563,8 @@
           "coolant_conc": false,
           "weekday": false
         },
-        "rule": "sigma"
+        "rule": "sigma",
+        "holdout_by": "hour"
       },
       "stops": {
         "unjustified_stops": 7587,
@@ -633,7 +641,8 @@
           "coolant_conc": false,
           "weekday": false
         },
-        "rule": "sigma"
+        "rule": "sigma",
+        "holdout_by": "hour"
       },
       "stops": {
         "unjustified_stops": 7382,
@@ -709,7 +718,8 @@
           "coolant_conc": false,
           "weekday": false
         },
-        "rule": "sigma"
+        "rule": "sigma",
+        "holdout_by": "hour"
       },
       "stops": {
         "unjustified_stops": 7416,
@@ -787,7 +797,8 @@
           "coolant_conc": false,
           "weekday": false
         },
-        "rule": "sigma"
+        "rule": "sigma",
+        "holdout_by": "hour"
       },
       "stops": {
         "unjustified_stops": 7442,
@@ -890,7 +901,8 @@
           "coolant_conc": false,
           "weekday": true
         },
-        "rule": "sigma"
+        "rule": "sigma",
+        "holdout_by": "hour"
       },
       "stops": {
         "unjustified_stops": 23380,
@@ -992,7 +1004,8 @@
           "coolant_conc": false,
           "weekday": false
         },
-        "rule": "sigma"
+        "rule": "sigma",
+        "holdout_by": "hour"
       },
       "stops": {
         "unjustified_stops": 23478,
@@ -1082,7 +1095,8 @@
           "coolant_conc": false,
           "weekday": false
         },
-        "rule": "sigma"
+        "rule": "sigma",
+        "holdout_by": "hour"
       },
       "stops": {
         "unjustified_stops": 23370,
@@ -1184,7 +1198,8 @@
           "coolant_conc": false,
           "weekday": false
         },
-        "rule": "sigma"
+        "rule": "sigma",
+        "holdout_by": "hour"
       },
       "stops": {
         "unjustified_stops": 23169,
@@ -1288,7 +1303,8 @@
           "coolant_conc": false,
           "weekday": false
         },
-        "rule": "sigma"
+        "rule": "sigma",
+        "holdout_by": "hour"
       },
       "stops": {
         "unjustified_stops": 23030,
@@ -1390,7 +1406,8 @@
           "coolant_conc": false,
           "weekday": false
         },
-        "rule": "sigma"
+        "rule": "sigma",
+        "holdout_by": "hour"
       },
       "stops": {
         "unjustified_stops": 23131,
@@ -1493,7 +1510,8 @@
           "coolant_conc": false,
           "weekday": false
         },
-        "rule": "sigma"
+        "rule": "sigma",
+        "holdout_by": "hour"
       },
       "stops": {
         "unjustified_stops": 23448,
@@ -1595,7 +1613,8 @@
           "coolant_conc": false,
           "weekday": false
         },
-        "rule": "sigma"
+        "rule": "sigma",
+        "holdout_by": "hour"
       },
       "stops": {
         "unjustified_stops": 23478,
@@ -1701,7 +1720,8 @@
           "coolant_conc": false,
           "weekday": true
         },
-        "rule": "sigma"
+        "rule": "sigma",
+        "holdout_by": "hour"
       },
       "stops": {
         "unjustified_stops": 23524,
@@ -1797,7 +1817,8 @@
           "coolant_conc": false,
           "weekday": false
         },
-        "rule": "sigma"
+        "rule": "sigma",
+        "holdout_by": "hour"
       },
       "stops": {
         "unjustified_stops": 23350,

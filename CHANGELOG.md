@@ -35,4 +35,15 @@
 
   No plant lost recall or precision. Sources: `results/eval/drift-envelope-only/summary.json` and `results/eval/summary.json`. `bench.evaluate` now reports drift recall per fault type and healthy-machine false positives, and `--drift-step-test off` reproduces the envelope-only grid. The slow test's drift recall floor moves up to 0.9833 − 0.10, and it gains a drift healthy-machine ceiling of 0.05.
 - Stock gap, laptop vs Xeon: the 11.5 s stock answer from 0.5 does not reproduce. The same command now gives 6,011 ms stock and 983 ms oneDAL on battery (`results/findings/stock-gap-bench-battery/summary.json`). The remaining 6.1× vs 4.0× comes from oneDAL using the laptop's 12 threads, while stock pays thread-pool start-up on many small calls with `n_jobs=-1`. P-core vs E-core placement moves single runs. Native pools and Windows power throttling are not the cause. No tool change: every `n_jobs` value measured helps one backend and hurts the other. `bench/probe_stock_gap.py` repeats the measurement, and `bench.run_bench` now records AC or battery and the power plan on Windows. See `docs/findings/stock-gap.md`.
+- Day holdout for drivers (tool version 0.5.0): `rank_loss_drivers` takes `holdout_by="day"`, which holds out a share of whole days instead of random hours. It was tested and stays off by default; `bench.evaluate --drivers-holdout` picks the split. Seeds 1–10, sizes S and M, stock:
+
+  | | Hour split, 2σ / 20% (kept) | Day split, 2σ / 20% | Day split, shadow |
+  |---|---:|---:|---:|
+  | Runs with any null driver reported | 25% | 10% | 45% |
+  | operator / weekday / coolant concentration reported | 20% / 15% / 0% | 5% / 5% / 0% | 20% / 15% / 25% |
+  | Planted drivers in the top 3 | 71.25% | 66.25% | 68.75% |
+  | Planted drivers reported | 80.0% | 50.0% | 80.0% |
+  | tool age / supplier / days since PM / shift reported | 100% / 95% / 95% / 30% | 75% / 75% / 25% / 25% | 100% / 85% / 60% / 75% |
+
+  Sources: `results/eval/summary.json`, `results/eval/drivers-holdout-day/summary.json` and `results/eval/drivers-shadow-holdout-day/summary.json`. The default grid is unchanged run for run.
 - MCP server: `agent/mcp_server.py` exposes the four tools from `tools/schemas.json` over stdio with the official `mcp` SDK (v2 low-level `Server`), returning `tools.public(envelope)` as text and structured content. Unknown arguments come back as tool errors. `mcp` is an optional extra (`pip install -e ".[mcp]"`), and `tests/test_mcp_server.py` skips without it.

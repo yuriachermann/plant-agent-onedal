@@ -13,7 +13,8 @@ the rates below.
 * Drivers: how often each planted driver is in the top 3 by importance, how
   often each planted driver is reported, and how often a null driver is
   reported (both by the tool's own reporting rule; ``--drivers-rule`` picks
-  which one).
+  which one, and ``--drivers-holdout`` whether hours or whole days are held
+  out).
 * Stops: suggestion coverage and accuracy on unjustified stops, by count and
   by minutes. Accuracy is among the stops that received a suggestion.
   Minute weights are stop durations.
@@ -21,6 +22,7 @@ the rates below.
     python -m bench.evaluate
     python -m bench.evaluate --seeds 1 --sizes S --out results/_eval_smoke
     python -m bench.evaluate --drivers-rule shadow --out results/eval/drivers-shadow
+    python -m bench.evaluate --drivers-holdout day --out results/eval/drivers-holdout-day
     python -m bench.evaluate --drift-step-test off --out results/eval/drift-envelope-only
 """
 from __future__ import annotations
@@ -37,7 +39,7 @@ sys.path.insert(0, str(REPO))
 
 from plantgen import generate_plant  # noqa: E402
 from tools import TOOLS, set_backend  # noqa: E402
-from tools.drivers import NULL_RULES  # noqa: E402
+from tools.drivers import HOLDOUT_BY, NULL_RULES  # noqa: E402
 
 
 def _rate(num: int, den: int) -> float | None:
@@ -94,6 +96,7 @@ def _drivers(plant, env) -> dict:
         "planted_reported": {d: d in reported for d in planted},
         "null_reported": {d: d in reported for d in nulls},
         "rule": env["result"].get("null_rule"),
+        "holdout_by": env["result"].get("holdout_by"),
     }
 
 
@@ -117,11 +120,14 @@ def _stops(plant, env) -> dict:
     }
 
 
-def score_plant(plant, backend: str = "stock", drivers_rule: str | None = None, drift_step_test: bool = True) -> dict:
+def score_plant(plant, backend: str = "stock", drivers_rule: str | None = None, drift_step_test: bool = True,
+                drivers_holdout: str | None = None) -> dict:
     set_backend(backend)
     drift = _drift(plant, TOOLS["detect_cycle_drift"](plant, None, step_test=drift_step_test))
     health = _health(plant, TOOLS["signal_health"](plant, None))
     dparams = {"null_rule": drivers_rule} if drivers_rule else {}
+    if drivers_holdout:
+        dparams["holdout_by"] = drivers_holdout
     drivers = _drivers(plant, TOOLS["rank_loss_drivers"](plant, None, **dparams))
     stops = _stops(plant, TOOLS["cluster_stops"](plant, None))
     return {"drift": drift, "signal_health": health, "drivers": drivers, "stops": stops}
@@ -222,7 +228,8 @@ def render_md(summary: dict) -> str:
         "# Detection quality against planted truth",
         "",
         f"Backend `{summary['backend']}`, seeds {summary['seeds']}, sizes {summary['sizes']}, "
-        f"{summary['aggregate']['n_runs']} plants, driver rule `{summary.get('drivers_rule')}`. "
+        f"{summary['aggregate']['n_runs']} plants, driver rule `{summary.get('drivers_rule')}`, "
+        f"driver holdout by `{summary.get('drivers_holdout') or 'hour'}`. "
         "Definitions are in `summary.json`.",
         "",
         "## Drift (wear + step)",
@@ -289,12 +296,12 @@ def render_md(summary: dict) -> str:
 
 
 def run(seeds: list[int], sizes: list[str], backend: str, out: Path, drivers_rule: str | None = None,
-        drift_step_test: bool = True) -> dict:
+        drift_step_test: bool = True, drivers_holdout: str | None = None) -> dict:
     runs = []
     for size in sizes:
         for seed in seeds:
             plant = generate_plant(size, seed=seed)
-            scored = score_plant(plant, backend, drivers_rule, drift_step_test)
+            scored = score_plant(plant, backend, drivers_rule, drift_step_test, drivers_holdout)
             runs.append({"size": size, "seed": seed, "plant_id": plant.plant_id, **scored})
             d, h, s = scored["drift"], scored["signal_health"], scored["stops"]
             print(
@@ -308,6 +315,7 @@ def run(seeds: list[int], sizes: list[str], backend: str, out: Path, drivers_rul
         "seeds": seeds,
         "sizes": sizes,
         "drivers_rule": runs[0]["drivers"]["rule"] if runs else drivers_rule,
+        "drivers_holdout": runs[0]["drivers"]["holdout_by"] if runs else drivers_holdout,
         "drift_step_test": drift_step_test,
         "definitions": {
             "drift_positive": "drift_wear ∪ drift_step. Other flagged machines, including coolant faults, are false positives.",
@@ -357,11 +365,14 @@ def main(argv=None):
     ap.add_argument("--backend", choices=["stock", "onedal"], default="stock")
     ap.add_argument("--drivers-rule", choices=list(NULL_RULES), default=None,
                     help="rank_loss_drivers reporting rule; default is the tool's own default")
+    ap.add_argument("--drivers-holdout", choices=list(HOLDOUT_BY), default=None,
+                    help="rank_loss_drivers holdout split, random hours or whole days; default is the tool's own")
     ap.add_argument("--drift-step-test", choices=["on", "off"], default="on",
                     help="detect_cycle_drift step test; off scores the kNN envelope alone")
     ap.add_argument("--out", default=str(REPO / "results" / "eval"))
     args = ap.parse_args(argv)
-    run(args.seeds, args.sizes, args.backend, Path(args.out), args.drivers_rule, args.drift_step_test == "on")
+    run(args.seeds, args.sizes, args.backend, Path(args.out), args.drivers_rule, args.drift_step_test == "on",
+        args.drivers_holdout)
     return 0
 
 

@@ -1,6 +1,6 @@
 # Detection quality against planted truth
 
-Backend `stock`, seeds [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], sizes ['S', 'M'], 20 plants, driver rule `sigma`. Definitions are in `summary.json`.
+Backend `stock`, seeds [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], sizes ['S', 'M'], 20 plants, driver rule `sigma`, driver holdout by `hour`. Definitions are in `summary.json`.
 
 ## Drift (wear + step)
 

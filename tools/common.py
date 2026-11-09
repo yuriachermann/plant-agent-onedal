@@ -20,7 +20,7 @@ import pandas as pd
 
 from . import backend as B
 
-TOOL_VERSION = "0.4.0"
+TOOL_VERSION = "0.5.0"
 DAY = 86_400
 REPO = Path(__file__).resolve().parents[1]
 PARITY_FILE = Path(os.environ.get("PLANT_TOOLS_PARITY", REPO / "results" / "parity.json"))

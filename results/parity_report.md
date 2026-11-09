@@ -1,6 +1,6 @@
 # Parity gate: oneDAL vs stock scikit-learn
 
-Checked 2026-11-08T11:54:50+00:00 · sklearn 1.9.1 · sklearnex 2026.2.0 · tool version 0.4.0 · plant 40 machines, 30 days
+Checked 2026-11-09T12:29:24+00:00 · sklearn 1.9.1 · sklearnex 2026.2.0 · tool version 0.5.0 · plant 40 machines, 30 days
 
 | Tool | Scope | Result | Key metrics | oneDAL dispatch |
 |---|---|---|---|---|

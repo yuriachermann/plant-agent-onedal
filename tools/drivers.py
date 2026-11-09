@@ -20,6 +20,14 @@ Two rules decide which ranked columns are reported as drivers:
   target. The forest is fitted on features and shadows together, and a column
   is reported only if its importance is above zero and above the strongest
   shadow's.
+
+Two ways to pick the held-out hours:
+
+* ``hour`` (default): each machine-hour goes to the holdout with probability
+  ``holdout``, so most days have hours on both sides of the split.
+* ``day``: a ``holdout`` share of whole days is held out, so no day is on
+  both sides. Columns drawn once per day (operator, weekday) can then no
+  longer stand in for whatever else happened on that day.
 """
 from __future__ import annotations
 
@@ -39,6 +47,7 @@ LABEL = {"line_id": "line", "machine_type": "machine type", "shift": "shift", "s
          "days_since_pm": "days since preventive maintenance", "ambient_temp": "ambient temperature",
          "coolant_conc": "coolant concentration"}
 NULL_RULES = ("sigma", "shadow")
+HOLDOUT_BY = ("hour", "day")
 
 
 def _effect(h: pd.DataFrame, f: str, target: str) -> dict:
@@ -57,9 +66,11 @@ def _effect(h: pd.DataFrame, f: str, target: str) -> dict:
 def rank_loss_drivers(plant, scope: dict | None = None, target: str = "unplanned_rate", n_estimators: int = 200,
                       max_depth: int = 10, min_samples_leaf: int = 30, n_repeats: int = 5, holdout: float = 0.25,
                       perm_rows: int = 3000, seed: int = 0, top: int = 6, relevance: float = 0.20,
-                      null_rule: str = "sigma") -> dict:
+                      null_rule: str = "sigma", holdout_by: str = "hour") -> dict:
     if null_rule not in NULL_RULES:
         raise ValueError(f"rank_loss_drivers: null_rule must be one of {NULL_RULES}")
+    if holdout_by not in HOLDOUT_BY:
+        raise ValueError(f"rank_loss_drivers: holdout_by must be one of {HOLDOUT_BY}")
     est = B.estimators()
     T = Timer()
     with T.phase("prep"):
@@ -89,7 +100,20 @@ def rank_loss_drivers(plant, scope: dict | None = None, target: str = "unplanned
             srng = np.random.default_rng([seed, 1])
             Xm = np.hstack([X, np.column_stack([srng.permutation(X[:, j]) for j in range(n_feat)])])
         rng = np.random.default_rng(seed)
-        te = rng.random(len(y)) < holdout
+        hold_days, n_days = None, None
+        if holdout_by == "day":
+            if "day" not in h.columns:
+                raise ValueError("rank_loss_drivers: holdout_by='day' needs a 'day' column in the hours table")
+            day = h["day"].to_numpy()
+            days = np.unique(day)
+            n_days = len(days)
+            if n_days < 2:
+                raise ValueError("rank_loss_drivers: holdout_by='day' needs at least 2 days in scope")
+            k = min(n_days - 1, max(1, int(round(holdout * n_days))))
+            hold_days = np.sort(rng.choice(days, size=k, replace=False))
+            te = np.isin(day, hold_days)
+        else:
+            te = rng.random(len(y)) < holdout
         Xtr, ytr, Xte, yte = (np.ascontiguousarray(a) for a in (Xm[~te], y[~te], Xm[te], y[te]))
         # permutation importance on a fixed-size sample of the holdout keeps the cost flat as plants grow
         pr = np.sort(rng.permutation(len(yte))[:perm_rows])
@@ -141,13 +165,18 @@ def rank_loss_drivers(plant, scope: dict | None = None, target: str = "unplanned
             "missing_features": missing,
             "target_hours_total": round(float(y.sum()) / 60, 1),
             "null_rule": null_rule,
+            "holdout_by": holdout_by,
         }
         if null_rule == "shadow":
             result["shadow_max_importance"] = round(shadow_max, 4)
+        if hold_days is not None:
+            result["holdout_days"] = [int(d) for d in hold_days]
         what = {"unplanned_rate": "unplanned stop minutes per available hour",  # noqa: E501
                 "unplanned_minutes": "unplanned stop minutes"}.get(target, target.replace("_", " "))
         facts["M"] = (f"Model of {what} on {len(y)} machine-hours over {d1 - d0 + 1} days; holdout R² {r2:.2f}. "
                       "Rankings show association, not cause." + (" " + conf[0] if conf else ""))
+        if hold_days is not None:
+            facts["M"] += f" The holdout is {len(hold_days)} whole days of the {n_days} in scope."
         if null_rule == "shadow":
             facts["M"] += (f" A driver is reported only if it beats the strongest of {n_feat} shuffled copies of the "
                            f"features (importance {shadow_max:.3f}).")
@@ -155,7 +184,7 @@ def rank_loss_drivers(plant, scope: dict | None = None, target: str = "unplanned
             facts["M"] += " Missing features, left out rather than filled in: " + ", ".join(missing) + "."
     params = {"target": target, "n_estimators": n_estimators, "max_depth": max_depth,
               "min_samples_leaf": min_samples_leaf, "n_repeats": n_repeats, "holdout": holdout,
-              "perm_rows": perm_rows, "relevance": relevance, "null_rule": null_rule,
+              "perm_rows": perm_rows, "relevance": relevance, "null_rule": null_rule, "holdout_by": holdout_by,
               "seed": seed, "features": cats + nums, "missing_features": missing}
     return envelope("rank_loss_drivers", scope, params, fingerprint(y, X[:, -3]), result, facts, T,
                     extra={"_importances": imp_mean})

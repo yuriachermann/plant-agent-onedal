@@ -88,6 +88,29 @@ def test_driver_null_rules(plant):
         TOOLS["rank_loss_drivers"](plant, None, null_rule="nope")
 
 
+def test_driver_holdout_by_day(plant):
+    set_backend("stock")
+    by_hour = TOOLS["rank_loss_drivers"](plant, None)["result"]
+    env = TOOLS["rank_loss_drivers"](plant, None, holdout_by="day")
+    by_day = env["result"]
+    assert by_hour["holdout_by"] == "hour" and "holdout_days" not in by_hour
+    assert by_day["holdout_by"] == "day" and env["params"]["holdout_by"] == "day"
+    hours = plant.hours[plant.hours["unplanned_rate"].notna()]
+    held = hours["day"].isin(by_day["holdout_days"])
+    # whole days: every hour of a held-out day is in the holdout, every other hour trains
+    assert by_day["holdout_hours"] == int(held.sum())
+    assert by_day["train_hours"] == int((~held).sum())
+    assert 0 < len(by_day["holdout_days"]) < hours["day"].nunique()
+    model_fact = next(f["text"] for f in env["facts"] if f["id"].endswith("#M"))
+    assert f"{len(by_day['holdout_days'])} whole days" in model_fact
+    assert {r["driver"] for r in by_day["ranking"]} == {r["driver"] for r in by_hour["ranking"]}
+    with pytest.raises(ValueError):
+        TOOLS["rank_loss_drivers"](plant, None, holdout_by="week")
+    last = int(hours["day"].max())
+    with pytest.raises(ValueError):  # one day in scope cannot be split by day
+        TOOLS["rank_loss_drivers"](plant, {"day_from": last, "day_to": last}, holdout_by="day")
+
+
 def test_drift_step_test_flags_planted_step(plant):
     set_backend("stock")
     env = TOOLS["detect_cycle_drift"](plant, None)
