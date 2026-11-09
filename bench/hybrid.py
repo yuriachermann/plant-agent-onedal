@@ -6,7 +6,8 @@ that did not opt out ran mostly on the E-cores in 10 of 12 processes. With the
 opt-out it stayed on the P-cores in all 12 (docs/findings/stock-gap.md, section 6).
 
 The benchmark processes (``bench.run_bench`` and ``bench.kernels``) opt out unless
-``PLANT_BENCH_ECOQOS=keep``. Everything here is a no-op off Windows.
+``PLANT_BENCH_ECOQOS=keep``. The MCP tool server (``agent.mcp_server``) opts out
+unless it is started with ``--keep-ecoqos``. Everything here is a no-op off Windows.
 """
 from __future__ import annotations
 
@@ -92,15 +93,19 @@ def opt_out_of_ecoqos() -> None:
         raise OSError(ctypes.get_last_error(), "SetProcessInformation(ProcessPowerThrottling) failed")
 
 
-def apply_ecoqos_policy() -> bool | None:
-    """Opt this benchmark process out of EcoQoS unless ``PLANT_BENCH_ECOQOS=keep``.
+def apply_ecoqos_policy(keep: bool | None = None) -> bool | None:
+    """Opt this process out of EcoQoS unless ``keep`` is true.
 
-    Returns True when the process opted out, False when it kept the Windows default
-    (asked to, or the call failed), and None off Windows.
+    ``keep=None`` reads ``PLANT_BENCH_ECOQOS`` (``keep`` keeps the Windows default). That is how
+    the benchmark's child processes get the parent's ``--keep-ecoqos``. Returns True when the
+    process opted out, False when it kept the Windows default (asked to, or the call failed),
+    and None off Windows.
     """
     if platform.system() != "Windows":
         return None
-    if os.environ.get(ECOQOS_ENV, "").strip().lower() == "keep":
+    if keep is None:
+        keep = os.environ.get(ECOQOS_ENV, "").strip().lower() == "keep"
+    if keep:
         return False
     try:
         opt_out_of_ecoqos()

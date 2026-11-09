@@ -81,6 +81,10 @@ python -m agent.mcp_server --plant-dir data/plant-M          # or a real export
 
 `tests/test_mcp_server.py` drives it with an in-process client and is skipped when `mcp` is not installed.
 
+On Windows the server opts itself out of power throttling (EcoQoS) at start-up. A server started in the
+background on a hybrid CPU can otherwise run its tool calls on the E-cores (`docs/findings/stock-gap.md`,
+section 6). `--keep-ecoqos` leaves it to Windows.
+
 ## What changed for oneDAL, and what didn't
 
 | Change | Why |

@@ -210,6 +210,19 @@ Outcome: done. Four size-M runs on AC, in the order opt-out, keep, keep, opt-out
 - The kernel sweeps were skipped in these runs. `bench.kernels` applies the same policy and records `ecoqos_opt_out` in its JSON, but no sweep has run with it yet.
 - `ruff check .` clean. `pytest -q`: 32 passed, 1 skipped (`mcp` not installed), with new tests for the opt-out policy and the report header. No change under `tools/`, so no parity run was needed.
 
+## EcoQoS opt-out in the MCP server (decision 6, option b)
+
+Plan: have `agent/mcp_server.py` call the benchmark's opt-out at start-up, before the plant loads, with `--keep-ecoqos` to turn it off. Give `apply_ecoqos_policy` an explicit `keep`, so the benchmark's environment variable does not reach the server. Test without the `mcp` SDK. Then start the server over stdio in both modes and read its throttling state from outside.
+
+Files: `agent/mcp_server.py`, `bench/hybrid.py`, `tests/test_platform.py`, `docs/findings/stock-gap.md`, `README.md`, `CHANGELOG.md`, `PROGRESS.md`.
+
+Outcome: done.
+
+- Stdio smoke run on plant S, seed 3, with `mcp` from the scratch install. `GetProcessInformation(ProcessPowerThrottling)` on the server's interpreter process gave ControlMask 1, StateMask 0 (execution speed controlled, not throttled) by default. With `--keep-ecoqos` it gave ControlMask 0. In both modes the server listed 4 tools, and `signal_health` returned the same call id, marked citable.
+- A venv's `python.exe` on Windows is a launcher that starts the base interpreter as a child process. The server code runs in that child, which is where the opt-out applies. The launcher process stays at the Windows default.
+- The server's effect on tool-call latency was not measured, here or on the NUC.
+- `tests/test_mcp_server.py` with the scratch `mcp` install: 2 passed. `ruff check .` clean. `pytest -q`: 34 passed, 1 skipped (`mcp` not installed in the `.venv`), with new tests for the server's policy and for an explicit `keep`. No change under `tools/`, so no parity run was needed.
+
 ## Decisions needed
 
 1. **Resolved 2026-11-09: grouped holdout tested and rejected.** See "Null drivers: day holdout". Holding out whole days cuts runs with a null driver from 25% to 10% but planted drivers reported from 80% to 50%, so the random-hour split stays. `holdout_by="day"` stays available, off by default.
@@ -217,6 +230,6 @@ Outcome: done. Four size-M runs on AC, in the order opt-out, keep, keep, opt-out
 3. **Resolved 2026-11-08: `main` fast-forwarded.** An uncommitted edit to `results/parity_report.md` in the main checkout (re-encoded `·` separators and a blank line) blocked the fast-forward. On your go-ahead it was discarded and `main` was fast-forwarded to the session branch.
 4. **Resolved 2026-11-09: AC rerun done.** See "Stock gap on AC". Plugged in, the answer takes 4,941 ms stock and 878 ms oneDAL (5.62×). Stock is still 20% slower than on the Xeon, so the `n_jobs` explanation stands. One part is still open and needs you. The AC run was in power mode Best performance and the battery runs in Balanced, so battery and power mode are not separated. To separate them, set Settings > System > Power > Power mode to Balanced while plugged in, then rerun `python -m bench.run_bench --sizes M --repeats 3 --skip-kernels --out results/findings/stock-gap-bench-ac-balanced`. I won't change Windows settings myself.
 5. **Edge run (plan 0.8) still open.** This machine is the i5-12450H laptop, not the Intel Core Ultra 5 NUC, so prompt task 5 was skipped.
-6. **Opt out of EcoQoS on Windows? Partly resolved 2026-11-09.** Without the opt-out, the probe's main thread ran mostly on the E-cores in 10 of 12 processes (`results/findings/stock-gap-ecoqos-ac/`).
+6. **Resolved 2026-11-09: opt out of EcoQoS on Windows.** Without the opt-out, the probe's main thread ran mostly on the E-cores in 10 of 12 processes (`results/findings/stock-gap-ecoqos-ac/`).
    - (a) Done on your go-ahead. `bench.run_bench` and `bench.kernels` opt out on Windows and record it; `--keep-ecoqos` restores the old behaviour. See "EcoQoS opt-out in the benchmark". Laptop timings from before this change ran without the opt-out, so they do not compare directly.
-   - (b) Still open: should `agent/mcp_server.py` opt out too, so a tool server running in the background is not throttled? That changes how the agent runs on a hybrid edge PC. Not tested on the NUC.
+   - (b) Done on your go-ahead. `agent/mcp_server.py` opts out at start-up; `--keep-ecoqos` restores the old behaviour. See "EcoQoS opt-out in the MCP server". The effect is still unmeasured on the NUC.

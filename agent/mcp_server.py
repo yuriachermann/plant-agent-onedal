@@ -13,6 +13,11 @@ imports this module.
     python -m agent.mcp_server --backend onedal
     python -m agent.mcp_server --plant-dir data/plant-M
 
+On Windows the server opts itself out of power throttling (EcoQoS) at start-up.
+A server started in the background on a hybrid CPU can otherwise run its tool
+calls on the E-cores (docs/findings/stock-gap.md, section 6). ``--keep-ecoqos``
+leaves it to Windows.
+
 Logs go to stderr. stdout carries the protocol only.
 """
 from __future__ import annotations
@@ -117,6 +122,17 @@ def load(args) -> Any:
     return generate_plant(args.size, seed=args.seed)
 
 
+def set_power_policy(keep_ecoqos: bool) -> str:
+    """Windows: opt this process out of EcoQoS unless asked to keep it. Returns text for the start-up log line.
+
+    The tool calls run in worker threads of this process, so the process-wide opt-out covers them.
+    ``PLANT_BENCH_ECOQOS`` is the benchmark's switch and does not apply here.
+    """
+    from bench.hybrid import apply_ecoqos_policy
+    state = apply_ecoqos_policy(keep=keep_ecoqos)
+    return {True: ", EcoQoS opt-out", False: ", EcoQoS left to Windows"}.get(state, "")
+
+
 async def serve(server) -> None:
     from mcp.server.stdio import stdio_server
     async with stdio_server() as (read_stream, write_stream):
@@ -129,6 +145,8 @@ def main(argv=None) -> int:
     ap.add_argument("--plant-dir", help="directory written by `python -m plantgen` or a real export")
     ap.add_argument("--size", default="M", help="synthetic plant size when --plant-dir is not given")
     ap.add_argument("--seed", type=int, default=7)
+    ap.add_argument("--keep-ecoqos", action="store_true",
+                    help="Windows: leave power throttling (EcoQoS) to Windows instead of opting out")
     args = ap.parse_args(argv)
     try:
         import anyio
@@ -138,8 +156,9 @@ def main(argv=None) -> int:
         return 2
     import warnings
     warnings.filterwarnings("ignore")
+    power = set_power_policy(args.keep_ecoqos)  # before the plant loads, so start-up runs unthrottled too
     plant = load(args)
-    print(f"plant-agent MCP server: {plant.plant_id}, backend {args.backend}", file=sys.stderr)
+    print(f"plant-agent MCP server: {plant.plant_id}, backend {args.backend}{power}", file=sys.stderr)
     anyio.run(serve, build_server(plant))
     return 0
 

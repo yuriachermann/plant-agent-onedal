@@ -62,6 +62,29 @@ def test_bench_opts_out_of_ecoqos_unless_asked_to_keep_it(monkeypatch):
     assert apply_ecoqos_policy() is None
 
 
+def test_explicit_keep_wins_over_the_bench_variable(monkeypatch):
+    calls = []
+    monkeypatch.setattr(hybrid, "opt_out_of_ecoqos", lambda: calls.append(1))
+    monkeypatch.setattr(hybrid.platform, "system", lambda: "Windows")
+    monkeypatch.setenv(ECOQOS_ENV, "keep")
+    assert apply_ecoqos_policy(keep=False) is True and calls == [1]
+    monkeypatch.delenv(ECOQOS_ENV)
+    assert apply_ecoqos_policy(keep=True) is False and calls == [1]
+
+
+def test_mcp_server_opts_out_unless_asked_to_keep(monkeypatch):
+    # runs without the mcp SDK: the server module imports mcp only inside its functions
+    from agent.mcp_server import set_power_policy
+    calls = []
+    monkeypatch.setattr(hybrid, "opt_out_of_ecoqos", lambda: calls.append(1))
+    monkeypatch.setattr(hybrid.platform, "system", lambda: "Windows")
+    monkeypatch.setenv(ECOQOS_ENV, "keep")  # the benchmark's switch does not reach the server
+    assert set_power_policy(keep_ecoqos=False) == ", EcoQoS opt-out" and calls == [1]
+    assert set_power_policy(keep_ecoqos=True) == ", EcoQoS left to Windows" and calls == [1]
+    monkeypatch.setattr(hybrid.platform, "system", lambda: "Linux")
+    assert set_power_policy(keep_ecoqos=False) == ""
+
+
 def test_machine_info_records_power_on_windows():
     info = machine_info()
     if sys.platform != "win32":
