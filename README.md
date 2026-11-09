@@ -174,7 +174,9 @@ a plant edge PC. Run `python -m bench.run_bench` on your own edge hardware: it w
   plugged in and in Best performance mode, one answer took 4,941 ms stock and 878 ms oneDAL, against
   6,011 and 983 ms on battery (`results/findings/stock-gap-bench-ac/summary.json`). On Windows, a process that
   does not opt out of power throttling (EcoQoS) ran its main thread mostly on the E-cores in 10 of 12
-  probe processes (`results/findings/stock-gap-ecoqos-ac/`).
+  probe processes (`results/findings/stock-gap-ecoqos-ac/`). So on Windows `bench.run_bench` opts its processes out
+  of EcoQoS, records that it did and where the main thread ran, and prints both in the summary header
+  (`--keep-ecoqos` turns this off).
 
 ## License
 

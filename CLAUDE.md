@@ -20,7 +20,7 @@ Companion repo for the oneAPI DevSummit talk on 1 Dec 2026. Read `README.md`, `P
 
 - `plantgen/`: synthetic plant generator with planted faults and drivers (`plant.truth`), CSV I/O, and machine-hours derived from real exports.
 - `tools/`: the four agent tools, the backend switch (`backend.py`, the only file that imports estimators), the result envelope and `TOOL_VERSION` (`common.py`), and `schemas.json`.
-- `bench/`: parity gate (`parity.py`), benchmark (`run_bench.py`, `report.py`), kernel sweeps (`kernels.py`), detection scoring against planted truth (`evaluate.py`), slide table (`deck_numbers.py`) and one-off probes (`probe_*.py`).
+- `bench/`: parity gate (`parity.py`), benchmark (`run_bench.py`, `report.py`), kernel sweeps (`kernels.py`), detection scoring against planted truth (`evaluate.py`), slide table (`deck_numbers.py`), Windows hybrid-core helpers and the EcoQoS opt-out (`hybrid.py`) and one-off probes (`probe_*.py`).
 - `demo/`: scripted agent run (`agent_demo.py`) and the citation check (`cite_check.py`).
 - `agent/`: optional stdio MCP server for the four tools (`mcp_server.py`, needs the `mcp` extra).
 - `tests/`: fast pytest suite; `pytest -m slow` reruns the seeds 1–10 evaluation grid.

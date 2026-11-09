@@ -75,6 +75,26 @@ def test_report_prints_p50_p90_and_keeps_median(tmp_path):
     assert "40–55" in (tmp_path / "summary.md").read_text(encoding="utf-8")
 
 
+def test_report_shows_ecoqos_and_main_thread_placement(tmp_path):
+    _write_pair(tmp_path, 40, 10)
+    md = (tmp_path / "summary.md")
+    report_main([str(tmp_path)])
+    assert "EcoQoS" not in md.read_text(encoding="utf-8")  # older records: nothing claimed
+    assert "Main thread" not in md.read_text(encoding="utf-8")
+    for name, share in (("stock", 1.0), ("onedal", 0.875)):
+        rec = json.loads((tmp_path / f"bench_{name}.json").read_text())
+        rec["machine"].update(ac_power=True, power_plan="High performance", ecoqos_opt_out=True)
+        rec["main_thread"] = {"samples": 24, "pcore_share": share}
+        (tmp_path / f"bench_{name}.json").write_text(json.dumps(rec))
+    report_main([str(tmp_path)])
+    text = md.read_text(encoding="utf-8")
+    assert "on AC, plan High performance, EcoQoS opt-out" in text
+    assert "**Main thread on P-cores (on-demand calls):** stock 100% · oneDAL 88%" in text
+    summary = json.loads((tmp_path / "summary.json").read_text())
+    assert summary["machine"]["ecoqos_opt_out"] is True
+    assert summary["main_thread"]["onedal"]["pcore_share"] == 0.875
+
+
 def test_old_xeon_bench_json_still_parses(tmp_path):
     src = REPO / "results" / "intel-xeon-2t"
     for name in ("bench_stock.json", "bench_onedal.json"):

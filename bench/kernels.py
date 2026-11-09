@@ -67,6 +67,8 @@ from pathlib import Path  # noqa: E402
 
 import numpy as np  # noqa: E402
 
+from bench.hybrid import apply_ecoqos_policy  # noqa: E402
+
 warnings.filterwarnings("ignore")
 REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO))
@@ -96,6 +98,8 @@ def main(argv=None):
     if not args.backend or not args.out:
         ap.error("--backend and --out are required")
 
+    ecoqos = apply_ecoqos_policy()  # Windows: same EcoQoS policy as bench.run_bench
+
     from sklearn.cluster import kmeans_plusplus
 
     from plantgen import SIGNALS, generate_plant
@@ -109,6 +113,8 @@ def main(argv=None):
     threads = os.environ.get("PLANT_KERNELS_THREADS")
     res = {"backend": args.backend, "plant": plant.summary(), "kernels": {},
            "threads": int(threads) if threads else None, "threads_requested": requested}
+    if ecoqos is not None:
+        res["ecoqos_opt_out"] = ecoqos
     K = res["kernels"]
 
     K["dbscan"] = []

@@ -137,10 +137,26 @@ The same pair repeats up to `run-6.json`. Medians and ranges below are over the 
 * **It does not explain the gap to the Xeon.** With the opt-out, the stock answer took 4,338–6,851 ms, never below the Xeon's 4,104 ms. oneDAL took 767–1,000 ms, against the Xeon's 1,026 ms.
 * **The machine slowed down during the series.** Runs 4–6 were slower than runs 1–3 in both cases: the opt-out stock answer took 6,099–6,851 ms, against 4,338–4,479 ms. The P-core calibration loop ranged from 116 to 203 ms across the six runs. I ran nothing else in that time, and the cause is not recorded. The comparison above holds within every run.
 
+### The benchmark now opts out
+
+Since 2026-11-09, `bench.run_bench` and `bench.kernels` opt their processes out of EcoQoS on Windows. Each benchmark process records `ecoqos_opt_out` in its machine block, and the share of on-demand calls whose main thread was on a P-core (`main_thread`). `bench.report` prints both in the summary header, and `--keep-ecoqos` restores the old behaviour. The helpers live in `bench/hybrid.py`. The probe's cases are unchanged, so it can still compare the two.
+
+Four size-M runs on AC, in the order opt-out, keep, keep, opt-out (`results/findings/bench-ecoqos-ac/<run>/summary.json`):
+
+| Run | Main thread on P-cores, stock / oneDAL | Stock answer ms | oneDAL answer ms | Speed-up |
+|---|---|---:|---:|---:|
+| opt-out 1 | 100% / 100% | 4,672 | 787 | 5.94× |
+| keep 1 | 83% / 8% | 4,497 | 1,732 | 2.60× |
+| keep 2 | 79% / 100% | 5,408 | 846 | 6.39× |
+| opt-out 2 | 83% / 100% | 5,020 | 906 | 5.54× |
+
+Without the opt-out, Windows still kept most of the benchmark's stock process on the P-cores here, unlike in the probe. The one process that landed on the E-cores (oneDAL in keep 1) took about twice as long, and that run's speed-up fell to 2.60×. Two runs per setting are too few to give a rate. What they do show: with the opt-out, every process stayed mostly on the P-cores, and the speed-up stayed between 5.54× and 5.94×. Without it, the speed-up ranged from 2.60× to 6.39×. The opt-out does not pin the process: stock in opt-out 2 still had 4 of its 24 samples on E-cores.
+
 ## What changed
 
 * No tool change. Every `n_jobs` value measured favours one backend: `n_jobs=1` takes stock from 5,939 to 3,854 ms and oneDAL from 1,288 to 2,288 ms, and `n_jobs=2` lands between the two on both backends. The tools keep `n_jobs=-1`.
 * `bench.run_bench` now records `ac_power` and `power_plan` in the machine block on Windows, and `bench.report` prints them in the summary header. The 0.5 run would have shown its power state.
+* Since 2026-11-09, `bench.run_bench` and `bench.kernels` opt out of EcoQoS on Windows and record that they did. `bench.run_bench` also records where the main thread ran (section 6).
 * `bench/probe_stock_gap.py` stays in the repo to repeat this on the NUC or a plant PC. On Windows, each case now records where its main thread ran (`main_thread` and `main_thread_cpus`).
 
 ## For the talk
@@ -150,6 +166,6 @@ Quote the speed-up with the machine and its thread count. On a many-thread lapto
 ## What is still open
 
 * Battery vs power mode. The AC run was also in Best performance mode, while the battery runs were in Balanced, so section 5 does not split the two. One run on AC in Balanced mode would. That is a Windows setting for the owner to change.
-* Whether `bench.run_bench`, and the agent's tool server, should opt out of EcoQoS on Windows. Without the opt-out, a benchmark on this laptop mostly measures the E-cores, and a tool server running in the background on a hybrid edge PC may be throttled the same way. Not tested on the NUC. This is decision 6 in PROGRESS.md.
+* Whether the agent's tool server (`agent/mcp_server.py`) should opt out of EcoQoS on Windows too. A tool server running in the background on a hybrid edge PC may be throttled like the probe's default processes. Not tested on the NUC. This is the open part of decision 6 in PROGRESS.md.
 * A process started from a terminal in the foreground. Every process in section 6 was started from the app's shell.
 * Linux on the same laptop (WSL or a live USB), to separate Windows from hardware. Not tried.

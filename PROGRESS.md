@@ -196,6 +196,20 @@ Outcome: EcoQoS is the main source of the run-to-run noise on this laptop, not o
 - Every process was started from the Claude desktop app's shell. A process started from a terminal in the foreground was not tested.
 - `ruff check .` clean. `pytest -q`: 30 passed, 1 skipped (`mcp` not installed), with the new placement test in `tests/test_platform.py`. No change under `tools/`, so no parity run was needed.
 
+## EcoQoS opt-out in the benchmark (decision 6, option a)
+
+Plan: move the Windows core helpers from the probe into `bench/hybrid.py`. Make `bench.run_bench` and `bench.kernels` opt each timed process out of EcoQoS unless `PLANT_BENCH_ECOQOS=keep` (`--keep-ecoqos`). Record the opt-out and the main thread's P-core share, and print both in the report. Verify with size-M runs on AC, opt-out against keep. Change only `bench/`.
+
+Files: `bench/hybrid.py` (new), `bench/probe_stock_gap.py` (imports the helpers), `bench/run_bench.py`, `bench/kernels.py`, `bench/report.py`, `tests/test_platform.py`, `tests/test_bench.py`, `results/findings/bench-ecoqos-ac/`, `docs/findings/stock-gap.md`, `README.md`, `CHANGELOG.md`, `PROGRESS.md`.
+
+Outcome: done. Four size-M runs on AC, in the order opt-out, keep, keep, opt-out (`results/findings/bench-ecoqos-ac/<run>/summary.json`):
+
+- Opt-out: main thread on P-cores 100% / 100% and 83% / 100% (stock / oneDAL). Answers 4,672 / 787 ms (5.94×) and 5,020 / 906 ms (5.54×).
+- Keep: 83% / 8% and 79% / 100%. Answers 4,497 / 1,732 ms (2.60×) and 5,408 / 846 ms (6.39×). The oneDAL process that ran on the E-cores took about twice as long as the others.
+- In this harness, Windows kept the stock process mostly on the P-cores even without the opt-out, unlike in the probe. Two runs per setting show the mechanism works, not a rate.
+- The kernel sweeps were skipped in these runs. `bench.kernels` applies the same policy and records `ecoqos_opt_out` in its JSON, but no sweep has run with it yet.
+- `ruff check .` clean. `pytest -q`: 32 passed, 1 skipped (`mcp` not installed), with new tests for the opt-out policy and the report header. No change under `tools/`, so no parity run was needed.
+
 ## Decisions needed
 
 1. **Resolved 2026-11-09: grouped holdout tested and rejected.** See "Null drivers: day holdout". Holding out whole days cuts runs with a null driver from 25% to 10% but planted drivers reported from 80% to 50%, so the random-hour split stays. `holdout_by="day"` stays available, off by default.
@@ -203,7 +217,6 @@ Outcome: EcoQoS is the main source of the run-to-run noise on this laptop, not o
 3. **Resolved 2026-11-08: `main` fast-forwarded.** An uncommitted edit to `results/parity_report.md` in the main checkout (re-encoded `·` separators and a blank line) blocked the fast-forward. On your go-ahead it was discarded and `main` was fast-forwarded to the session branch.
 4. **Resolved 2026-11-09: AC rerun done.** See "Stock gap on AC". Plugged in, the answer takes 4,941 ms stock and 878 ms oneDAL (5.62×). Stock is still 20% slower than on the Xeon, so the `n_jobs` explanation stands. One part is still open and needs you. The AC run was in power mode Best performance and the battery runs in Balanced, so battery and power mode are not separated. To separate them, set Settings > System > Power > Power mode to Balanced while plugged in, then rerun `python -m bench.run_bench --sizes M --repeats 3 --skip-kernels --out results/findings/stock-gap-bench-ac-balanced`. I won't change Windows settings myself.
 5. **Edge run (plan 0.8) still open.** This machine is the i5-12450H laptop, not the Intel Core Ultra 5 NUC, so prompt task 5 was skipped.
-6. **Opt out of EcoQoS on Windows?** Without the opt-out, the probe's main thread ran mostly on the E-cores in 10 of 12 processes (`results/findings/stock-gap-ecoqos-ac/`). The options:
-   - (a) `bench.run_bench` opts out on Windows and records that it did, so benchmarks on hybrid machines measure the P-cores. Timings would then not match earlier laptop runs directly.
-   - (b) `agent/mcp_server.py` opts out too, so a tool server running in the background is not throttled. That changes how the agent runs on a hybrid edge PC, so it needs your call. Neither has been tested on the NUC.
-   - (c) Leave both as they are, and document it.
+6. **Opt out of EcoQoS on Windows? Partly resolved 2026-11-09.** Without the opt-out, the probe's main thread ran mostly on the E-cores in 10 of 12 processes (`results/findings/stock-gap-ecoqos-ac/`).
+   - (a) Done on your go-ahead. `bench.run_bench` and `bench.kernels` opt out on Windows and record it; `--keep-ecoqos` restores the old behaviour. See "EcoQoS opt-out in the benchmark". Laptop timings from before this change ran without the opt-out, so they do not compare directly.
+   - (b) Still open: should `agent/mcp_server.py` opt out too, so a tool server running in the background is not throttled? That changes how the agent runs on a hybrid edge PC. Not tested on the NUC.

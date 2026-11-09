@@ -17,6 +17,12 @@ the single ``--seed`` (7). Nightly stays on the first seed.
 The kernel sweep also runs at 1 thread, 2 threads, and all logical CPUs.
 Those processes set the BLAS and TBB thread variables before importing NumPy.
 
+On Windows every timed process opts out of power throttling (EcoQoS), which
+otherwise tends to put the main thread on the E-cores of a hybrid CPU, and
+records ``ecoqos_opt_out`` in its machine block. ``--keep-ecoqos`` leaves
+EcoQoS to Windows, as runs before 2026-11-09 did. Each backend also records
+the share of on-demand calls whose main thread was on a P-core (``main_thread``).
+
 Usage (writes results/<machine-tag>/):
     python -m bench.run_bench                      # both backends, sizes S M L
     python -m bench.run_bench --sizes M --repeats 3
@@ -35,6 +41,8 @@ import sys
 import time
 import warnings
 from pathlib import Path
+
+from bench.hybrid import ECOQOS_ENV, apply_ecoqos_policy, cpu_sets, current_cpu, placement
 
 warnings.filterwarnings("ignore")
 REPO = Path(__file__).resolve().parents[1]
@@ -139,6 +147,7 @@ def on_demand_scope(plant, tool: str) -> dict:
 
 
 def run_backend(backend: str, sizes: list[str], repeats: int, seeds: list[int]) -> dict:
+    ecoqos = apply_ecoqos_policy()  # before any timing; None off Windows
     t_import = time.perf_counter()
     from plantgen import generate_plant
     from tools import TOOLS, set_backend, versions
@@ -147,8 +156,12 @@ def run_backend(backend: str, sizes: list[str], repeats: int, seeds: list[int]) 
     estimators()  # import the backend's estimator modules now, not inside the first timed call
     import_ms = (time.perf_counter() - t_import) * 1000
 
-    out = {"backend": backend, "versions": versions(backend), "machine": machine_info(), "seed": seeds[0],
+    machine = machine_info()
+    if ecoqos is not None:
+        machine["ecoqos_opt_out"] = ecoqos
+    out = {"backend": backend, "versions": versions(backend), "machine": machine, "seed": seeds[0],
            "seeds": seeds, "repeats": repeats, "import_ms": round(import_ms, 1), "sizes": {}}
+    where = []  # logical processor of the main thread around each timed on-demand call
     for size in sizes:
         # Nightly uses the first seed only, so a one-seed run does the same work as before.
         plants = [generate_plant(size, seed=s) for s in seeds]
@@ -180,10 +193,12 @@ def run_backend(backend: str, sizes: list[str], repeats: int, seeds: list[int]) 
                 scope = on_demand_scope(p, name)
                 fn(p, scope)  # warm-up, per plant
                 for _ in range(repeats):
+                    where.append(current_cpu())
                     tc, tw = time.process_time(), time.perf_counter()
                     env = fn(p, scope)
                     walls.append((time.perf_counter() - tw) * 1000)
                     cpus.append((time.process_time() - tc) * 1000)
+                    where.append(current_cpu())
                     phases.append(env["timings_ms"])
             walls.sort()
             cpus.sort()
@@ -206,6 +221,7 @@ def run_backend(backend: str, sizes: list[str], repeats: int, seeds: list[int]) 
         out["sizes"][size] = res
         print(f"[{backend}] {size}: nightly cold {runs[0]['wall_ms']/1000:.1f}s warm {warm['wall_ms']/1000:.1f}s "
               f"cpu {warm['cpu_ms']/1000:.1f}s | answer {res['answer_ms']:.0f} ms", flush=True)
+    out["main_thread"] = placement(where, cpu_sets())
     return out
 
 
@@ -232,7 +248,11 @@ def main(argv=None):
     ap.add_argument("--out", default=None, help="output dir (default results/<machine-tag>)")
     ap.add_argument("--skip-kernels", action="store_true")
     ap.add_argument("--skip-thread-sweep", action="store_true")
+    ap.add_argument("--keep-ecoqos", action="store_true",
+                    help="Windows: leave power throttling (EcoQoS) to Windows instead of opting out")
     args = ap.parse_args(argv)
+    if args.keep_ecoqos:
+        os.environ[ECOQOS_ENV] = "keep"  # read by this process and inherited by the children below
     seeds = resolve_seeds(args.seed, args.seeds)
     outdir = Path(args.out) if args.out else REPO / "results" / machine_tag(machine_info())
     outdir.mkdir(parents=True, exist_ok=True)

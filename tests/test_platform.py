@@ -2,7 +2,8 @@
 import os
 import sys
 
-from bench.probe_stock_gap import current_cpu, placement
+from bench import hybrid
+from bench.hybrid import ECOQOS_ENV, apply_ecoqos_policy, current_cpu, placement
 from bench.run_bench import machine_info
 from demo.agent_demo import BOLD, color
 
@@ -41,6 +42,24 @@ def test_probe_placement_share():
         assert 0 <= cpu < (os.cpu_count() or 1)
     else:
         assert cpu is None
+
+
+def test_bench_opts_out_of_ecoqos_unless_asked_to_keep_it(monkeypatch):
+    calls = []
+    monkeypatch.setattr(hybrid, "opt_out_of_ecoqos", lambda: calls.append(1))
+    monkeypatch.setattr(hybrid.platform, "system", lambda: "Windows")
+    monkeypatch.delenv(ECOQOS_ENV, raising=False)
+    assert apply_ecoqos_policy() is True and calls == [1]
+    monkeypatch.setenv(ECOQOS_ENV, "keep")
+    assert apply_ecoqos_policy() is False and calls == [1]
+    monkeypatch.delenv(ECOQOS_ENV)
+
+    def fail():
+        raise OSError(87, "SetProcessInformation(ProcessPowerThrottling) failed")
+    monkeypatch.setattr(hybrid, "opt_out_of_ecoqos", fail)
+    assert apply_ecoqos_policy() is False  # a failed call is recorded, not hidden
+    monkeypatch.setattr(hybrid.platform, "system", lambda: "Linux")
+    assert apply_ecoqos_policy() is None
 
 
 def test_machine_info_records_power_on_windows():

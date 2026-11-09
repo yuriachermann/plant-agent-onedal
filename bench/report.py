@@ -23,7 +23,18 @@ def _power(machine: dict) -> str:
         return ""
     ac = {True: "on AC", False: "on battery", None: "power source unknown"}[machine["ac_power"]]
     plan = f", plan {machine['power_plan']}" if machine.get("power_plan") else ""
-    return f" · {ac}{plan}"
+    # recorded from 2026-11-09 on; older runs left EcoQoS to Windows
+    eco = {True: ", EcoQoS opt-out", False: ", EcoQoS left to Windows"}.get(machine.get("ecoqos_opt_out"), "")
+    return f" · {ac}{plan}{eco}"
+
+
+def _placement(s: dict, o: dict) -> str:
+    """Share of on-demand calls whose main thread was on a P-core, when the bench recorded it."""
+    shares = {name: (b.get("main_thread") or {}).get("pcore_share") for name, b in (("stock", s), ("oneDAL", o))}
+    if all(v is None for v in shares.values()):
+        return ""
+    cells = " · ".join(f"{name} {'n/a' if v is None else f'{v:.0%}'}" for name, v in shares.items())
+    return f"**Main thread on P-cores (on-demand calls):** {cells}"
 
 def spread(block: dict) -> str:
     """p50–p90 in milliseconds. Missing keys (older bench JSON) print as n/a."""
@@ -100,6 +111,8 @@ def main(argv=None):
     q = args.questions_per_day
     summary = {"machine": s["machine"], "versions": {"stock": s["versions"], "onedal": o["versions"]},
                "assumptions": {"questions_per_day": q, "usd_per_core_hour": args.usd_per_core_hour}, "sizes": {}}
+    if s.get("main_thread") or o.get("main_thread"):
+        summary["main_thread"] = {"stock": s.get("main_thread"), "onedal": o.get("main_thread")}
     seeds = s.get("seeds", [s["seed"]])
     seed_txt = f"seed {s['seed']}" if seeds == [s["seed"]] else f"seeds {seeds}"
     pooled = f" pooled across {len(seeds)} seeds" if len(seeds) > 1 else ""
@@ -107,7 +120,7 @@ def main(argv=None):
           f"**Machine:** {s['machine']['cpu']} · {s['machine']['logical_cpus']} logical CPUs · ISA {', '.join(s['machine']['isa']) or 'n/a'}"
           f" · {s['machine']['os']} · Python {s['machine']['python']}" + _power(s["machine"]),
           f"**Versions:** scikit-learn {s['versions']['sklearn']} · scikit-learn-intelex {o['versions'].get('sklearnex')}"
-          f" · oneDAL {o['versions'].get('onedal', '?')}", "",
+          f" · oneDAL {o['versions'].get('onedal', '?')}", *filter(None, [_placement(s, o)]), "",
           f"Synthetic plants, 30 days, {seed_txt}. On-demand = one line, median of {s['repeats']} warm calls{pooled}. "
           "p50–p90 is the spread of those calls. "
           "Nightly = whole plant, all four tools, on the first seed; cold = first run in a fresh process.", ""]

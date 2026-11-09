@@ -32,6 +32,8 @@ import sys
 import time
 from pathlib import Path
 
+from bench.hybrid import cpu_sets, current_cpu, opt_out_of_ecoqos, placement
+
 REPO = Path(__file__).resolve().parents[1]
 THREAD_VARS = (
     "OMP_NUM_THREADS", "MKL_NUM_THREADS", "OPENBLAS_NUM_THREADS",
@@ -42,35 +44,6 @@ TOOL_ORDER = ("cluster_stops", "detect_cycle_drift", "rank_loss_drivers", "signa
 
 
 # ------------------------------------------------------------------ Windows CPU sets
-def cpu_sets() -> list[dict]:
-    """Logical processors with their core and efficiency class. Empty off Windows."""
-    if platform.system() != "Windows":
-        return []
-    import ctypes
-    from ctypes import wintypes
-
-    k32 = ctypes.WinDLL("kernel32", use_last_error=True)
-    fn = k32.GetSystemCpuSetInformation
-    fn.restype = wintypes.BOOL
-    fn.argtypes = [ctypes.c_void_p, wintypes.ULONG, ctypes.POINTER(wintypes.ULONG), wintypes.HANDLE, wintypes.ULONG]
-    need = wintypes.ULONG(0)
-    fn(None, 0, ctypes.byref(need), None, 0)
-    if need.value == 0:
-        return []
-    buf = (ctypes.c_ubyte * need.value)()
-    if not fn(buf, need, ctypes.byref(need), None, 0):
-        return []
-    raw = bytes(buf)
-    out, off = [], 0
-    while off < len(raw):
-        size = int.from_bytes(raw[off:off + 4], "little")
-        if size == 0:
-            break
-        out.append({"logical": raw[off + 14], "core": raw[off + 15], "efficiency_class": raw[off + 18]})
-        off += size
-    return out
-
-
 def core_masks() -> dict[str, int]:
     """Affinity masks for the fastest and slowest efficiency classes (the P-cores and E-cores)."""
     sets = cpu_sets()
@@ -85,33 +58,6 @@ def core_masks() -> dict[str, int]:
     return {"pcores": p, "ecores": e}
 
 
-_GET_CPU = None
-
-
-def current_cpu() -> int | None:
-    """Logical processor the calling thread is on right now. None off Windows."""
-    global _GET_CPU
-    if platform.system() != "Windows":
-        return None
-    if _GET_CPU is None:
-        import ctypes
-        _GET_CPU = ctypes.WinDLL("kernel32").GetCurrentProcessorNumber
-    return int(_GET_CPU())
-
-
-def placement(cpus: list[int | None], sets: list[dict]) -> dict:
-    """Share of main-thread samples on the fastest efficiency class (the P-cores).
-
-    ``pcore_share`` is None when there are no samples or the CPU has one core class.
-    """
-    cls = {s["logical"]: s["efficiency_class"] for s in sets}
-    seen = [cls[c] for c in cpus if c is not None and c in cls]
-    if not seen or len(set(cls.values())) < 2:
-        return {"samples": len(seen), "pcore_share": None}
-    hi = max(cls.values())
-    return {"samples": len(seen), "pcore_share": round(sum(c == hi for c in seen) / len(seen), 3)}
-
-
 def pin(mask: int) -> None:
     import ctypes
     from ctypes import wintypes
@@ -121,25 +67,6 @@ def pin(mask: int) -> None:
     k32.SetProcessAffinityMask.argtypes = [wintypes.HANDLE, ctypes.c_size_t]
     if not k32.SetProcessAffinityMask(k32.GetCurrentProcess(), mask):
         raise OSError(ctypes.get_last_error(), "SetProcessAffinityMask failed")
-
-
-def opt_out_of_ecoqos() -> None:
-    """Ask Windows not to throttle this process's execution speed (EcoQoS). Affects this process only."""
-    import ctypes
-    from ctypes import wintypes
-
-    class State(ctypes.Structure):
-        _fields_ = [("Version", wintypes.ULONG), ("ControlMask", wintypes.ULONG), ("StateMask", wintypes.ULONG)]
-
-    k32 = ctypes.WinDLL("kernel32", use_last_error=True)
-    k32.GetCurrentProcess.restype = wintypes.HANDLE
-    k32.SetProcessInformation.restype = wintypes.BOOL
-    k32.SetProcessInformation.argtypes = [wintypes.HANDLE, ctypes.c_int, ctypes.c_void_p, wintypes.DWORD]
-    process_power_throttling, execution_speed = 4, 0x1
-    st = State(1, execution_speed, 0)  # control execution speed, state off = never throttle
-    if not k32.SetProcessInformation(k32.GetCurrentProcess(), process_power_throttling, ctypes.byref(st),
-                                     ctypes.sizeof(st)):
-        raise OSError(ctypes.get_last_error(), "SetProcessInformation(ProcessPowerThrottling) failed")
 
 
 def power_state() -> dict:
