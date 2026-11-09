@@ -167,10 +167,24 @@ Outcome: day holdout rejected. The default stays the random-hour split with the 
 - The guess in decision 1 holds only in part. Operator and weekday are reported less when no day sits on both sides, but planted drivers that change once a day (days since PM, supplier) lose as much. One reading, not tested: with the hour split, any column that changes once a day can also act as a day marker, for planted and null drivers alike.
 - Drift, signal health and stop results are identical in all three grids. `python -m bench.parity` (tool version 0.5.0): PASS, same metrics as before; the gate runs the default split only. `ruff check .` clean. `pytest -q`: 29 passed, 1 skipped (`mcp` not installed).
 
+## Stock gap on AC (decision 4)
+
+Plan: with the laptop plugged in, run the two commands from decision 4 back to back, then compare them with the battery runs and the Xeon. No code change.
+
+Files: `results/findings/stock-gap-ac.json`, `results/findings/stock-gap-bench-ac/`, `docs/findings/stock-gap.md` (section 5), `README.md`, `CHANGELOG.md`, `PROGRESS.md`.
+
+Outcome: battery accounts for part of the slow 0.5 run, but not for the gap to the Xeon. No tool change.
+
+- Power state: AC online, plan "High performance". The probe recorded the Windows power mode overlay `ded574b5-45a0-4f42-8737-46345c09c238` (Best performance) on both its AC and its battery setting. The battery probe in `results/findings/stock-gap-ecoqos-battery.json` recorded Balanced (all zeros). I did not change any power setting, so this compares battery in Balanced mode with AC in Best performance.
+- Benchmark, `results/findings/stock-gap-bench-ac/summary.json`: one answer takes 4,941 ms stock and 878 ms oneDAL (5.62×), against 6,011 and 983 ms on battery (6.12×, `results/findings/stock-gap-bench-battery/summary.json`). Every stock call is 16–22% faster. The Xeon's stock answer is 4,104 ms (`results/intel-xeon-2t/summary.json`), so stock here is still 20% slower, mostly in drift (1,540 vs 1,003 ms). oneDAL is now faster than the Xeon's 1,026 ms.
+- Probe, `results/findings/stock-gap-ac.json`: the first case, the unpinned default, ran its single-threaded phases at E-core speed (5,558 / 1,622 ms). The P-core and EcoQoS opt-out cases ran at 4,768 / 916 and 4,760 / 840 ms. `n_jobs=1` gives 2,985 / 1,649 ms: the same trade-off as on battery.
+- The one-shot calibration loop on a P-core took 142.85 ms, against 97.0 and 113.83 ms on battery. Two short JSON reads of mine (each under a second) ran in the probe's first 30 seconds, during the calibration and overhead steps, so that calibration may be off. The cases ran after that. The unpinned default oneDAL case, which ran at E-core speed, came after the stock default case.
+- `ruff check .` clean. `pytest -q`: 29 passed, 1 skipped (`mcp` not installed). No change under `tools/`, so no parity run was needed.
+
 ## Decisions needed
 
 1. **Resolved 2026-11-09: grouped holdout tested and rejected.** See "Null drivers: day holdout". Holding out whole days cuts runs with a null driver from 25% to 10% but planted drivers reported from 80% to 50%, so the random-hour split stays. `holdout_by="day"` stays available, off by default.
 2. **Re-run the Xeon reference before the talk?** `results/intel-xeon-2t/` was measured with tool version 0.2.0. Version 0.4.0 adds the drift step test (more post-processing per call), and the slide plant (M seed 7) now reports 6 drifting machines instead of 4. The tools are now at 0.5.0; the day-holdout option does not change the default path. The deck's timing table and any drift screenshot should come from a fresh `python -m bench.run_bench` on the Xeon.
 3. **Resolved 2026-11-08: `main` fast-forwarded.** An uncommitted edit to `results/parity_report.md` in the main checkout (re-encoded `·` separators and a blank line) blocked the fast-forward. On your go-ahead it was discarded and `main` was fast-forwarded to the session branch.
-4. **AC rerun of the stock-gap probe.** All task-4 timings ran on battery. Plug in and run `python -m bench.probe_stock_gap --repeats 3 --out results/findings/stock-gap-ac.json` and `python -m bench.run_bench --sizes M --repeats 3 --skip-kernels --out results/findings/stock-gap-bench-ac` to separate battery from the rest. I did not change any power setting.
+4. **Resolved 2026-11-09: AC rerun done.** See "Stock gap on AC". Plugged in, the answer takes 4,941 ms stock and 878 ms oneDAL (5.62×). Stock is still 20% slower than on the Xeon, so the `n_jobs` explanation stands. One part is still open and needs you. The AC run was in power mode Best performance and the battery runs in Balanced, so battery and power mode are not separated. To separate them, set Settings > System > Power > Power mode to Balanced while plugged in, then rerun `python -m bench.run_bench --sizes M --repeats 3 --skip-kernels --out results/findings/stock-gap-bench-ac-balanced`. I won't change Windows settings myself.
 5. **Edge run (plan 0.8) still open.** This machine is the i5-12450H laptop, not the Intel Core Ultra 5 NUC, so prompt task 5 was skipped.
