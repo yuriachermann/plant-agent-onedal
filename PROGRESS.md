@@ -181,6 +181,21 @@ Outcome: battery accounts for part of the slow 0.5 run, but not for the gap to t
 - The one-shot calibration loop on a P-core took 142.85 ms, against 97.0 and 113.83 ms on battery. Two short JSON reads of mine (each under a second) ran in the probe's first 30 seconds, during the calibration and overhead steps, so that calibration may be off. The cases ran after that. The unpinned default oneDAL case, which ran at E-core speed, came after the stock default case.
 - `ruff check .` clean. `pytest -q`: 29 passed, 1 skipped (`mcp` not installed). No change under `tools/`, so no parity run was needed.
 
+## EcoQoS and thread placement (follow-up to decision 4)
+
+Plan: make the probe record where the main thread runs, then repeat the default and EcoQoS opt-out cases six times on AC, alternating which runs first. Change only `bench/`; the tools stay as they are.
+
+Files: `bench/probe_stock_gap.py` (`current_cpu`, `placement`, `main_thread` and `main_thread_cpus` per case), `tests/test_platform.py`, `results/findings/stock-gap-ecoqos-ac/run-1.json` to `run-6.json`, `docs/findings/stock-gap.md` (section 6), `README.md`, `CHANGELOG.md`, `PROGRESS.md`.
+
+Outcome: EcoQoS is the main source of the run-to-run noise on this laptop, not of the gap to the Xeon.
+
+- Without the opt-out, the main thread ran mostly on the E-cores in 10 of 12 processes, whether the default case ran first or second. With the opt-out, it ran on the P-cores in all 12 (83–100% of samples).
+- Answer medians over the six runs: default 6,344 ms stock and 1,496 ms oneDAL; opt-out 5,289 and 868 ms. Within each run, the opt-out was faster on oneDAL in 6 of 6 runs and on stock in 5 of 6. The exception is run 3, where the default also ran on the P-cores.
+- With the opt-out, stock never beat the Xeon's 4,104 ms (4,338–6,851 ms), so the `n_jobs` explanation of the gap stands.
+- Runs 4–6 were slower than runs 1–3 in both cases (opt-out stock 6,099–6,851 against 4,338–4,479 ms). I ran nothing else during the series, and the cause is not recorded.
+- Every process was started from the Claude desktop app's shell. A process started from a terminal in the foreground was not tested.
+- `ruff check .` clean. `pytest -q`: 30 passed, 1 skipped (`mcp` not installed), with the new placement test in `tests/test_platform.py`. No change under `tools/`, so no parity run was needed.
+
 ## Decisions needed
 
 1. **Resolved 2026-11-09: grouped holdout tested and rejected.** See "Null drivers: day holdout". Holding out whole days cuts runs with a null driver from 25% to 10% but planted drivers reported from 80% to 50%, so the random-hour split stays. `holdout_by="day"` stays available, off by default.
@@ -188,3 +203,7 @@ Outcome: battery accounts for part of the slow 0.5 run, but not for the gap to t
 3. **Resolved 2026-11-08: `main` fast-forwarded.** An uncommitted edit to `results/parity_report.md` in the main checkout (re-encoded `·` separators and a blank line) blocked the fast-forward. On your go-ahead it was discarded and `main` was fast-forwarded to the session branch.
 4. **Resolved 2026-11-09: AC rerun done.** See "Stock gap on AC". Plugged in, the answer takes 4,941 ms stock and 878 ms oneDAL (5.62×). Stock is still 20% slower than on the Xeon, so the `n_jobs` explanation stands. One part is still open and needs you. The AC run was in power mode Best performance and the battery runs in Balanced, so battery and power mode are not separated. To separate them, set Settings > System > Power > Power mode to Balanced while plugged in, then rerun `python -m bench.run_bench --sizes M --repeats 3 --skip-kernels --out results/findings/stock-gap-bench-ac-balanced`. I won't change Windows settings myself.
 5. **Edge run (plan 0.8) still open.** This machine is the i5-12450H laptop, not the Intel Core Ultra 5 NUC, so prompt task 5 was skipped.
+6. **Opt out of EcoQoS on Windows?** Without the opt-out, the probe's main thread ran mostly on the E-cores in 10 of 12 processes (`results/findings/stock-gap-ecoqos-ac/`). The options:
+   - (a) `bench.run_bench` opts out on Windows and records that it did, so benchmarks on hybrid machines measure the P-cores. Timings would then not match earlier laptop runs directly.
+   - (b) `agent/mcp_server.py` opts out too, so a tool server running in the background is not throttled. That changes how the agent runs on a hybrid edge PC, so it needs your call. Neither has been tested on the NUC.
+   - (c) Leave both as they are, and document it.

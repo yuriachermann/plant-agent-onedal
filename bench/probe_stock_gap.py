@@ -14,9 +14,12 @@ cases change one thing at a time:
 
 It also records the power plan, AC state, thread pools, and a single-thread
 calibration (a pure-Python loop and a NumPy sort) pinned to one P-core and
-one E-core. The tools are not changed.
+one E-core. On Windows each case also samples the logical processor its main
+thread is on just before and just after every tool call, and reports the share
+of samples on P-cores (``main_thread``). The tools are not changed.
 
     python -m bench.probe_stock_gap --out results/findings/stock-gap.json
+    python -m bench.probe_stock_gap --cases default noecoqos --out results/findings/x.json
 """
 from __future__ import annotations
 
@@ -80,6 +83,33 @@ def core_masks() -> dict[str, int]:
     p = sum(1 << s["logical"] for s in sets if s["efficiency_class"] == hi)
     e = sum(1 << s["logical"] for s in sets if s["efficiency_class"] == lo)
     return {"pcores": p, "ecores": e}
+
+
+_GET_CPU = None
+
+
+def current_cpu() -> int | None:
+    """Logical processor the calling thread is on right now. None off Windows."""
+    global _GET_CPU
+    if platform.system() != "Windows":
+        return None
+    if _GET_CPU is None:
+        import ctypes
+        _GET_CPU = ctypes.WinDLL("kernel32").GetCurrentProcessorNumber
+    return int(_GET_CPU())
+
+
+def placement(cpus: list[int | None], sets: list[dict]) -> dict:
+    """Share of main-thread samples on the fastest efficiency class (the P-cores).
+
+    ``pcore_share`` is None when there are no samples or the CPU has one core class.
+    """
+    cls = {s["logical"]: s["efficiency_class"] for s in sets}
+    seen = [cls[c] for c in cpus if c is not None and c in cls]
+    if not seen or len(set(cls.values())) < 2:
+        return {"samples": len(seen), "pcore_share": None}
+    hi = max(cls.values())
+    return {"samples": len(seen), "pcore_share": round(sum(c == hi for c in seen) / len(seen), 3)}
 
 
 def pin(mask: int) -> None:
@@ -217,16 +247,19 @@ def _child(case: str, backend: str, size: str, seed: int, repeats: int) -> dict:
         _force_njobs(int(case.removeprefix("njobs")))
     plant = generate_plant(size, seed=seed)
     tools = {}
+    where = []  # logical processor of the main thread, sampled outside the timed window
     for name in TOOL_ORDER:
         fn = TOOLS[name]
         scope = on_demand_scope(plant, name)
         fn(plant, scope)  # warm-up
         walls, cpus, phases = [], [], []
         for _ in range(repeats):
+            where.append(current_cpu())
             tc, tw = time.process_time(), time.perf_counter()
             env = fn(plant, scope)
             walls.append((time.perf_counter() - tw) * 1000)
             cpus.append((time.process_time() - tc) * 1000)
+            where.append(current_cpu())
             phases.append(env["timings_ms"])
         order = sorted(range(len(walls)), key=walls.__getitem__)
         mid = order[len(order) // 2]
@@ -247,6 +280,8 @@ def _child(case: str, backend: str, size: str, seed: int, repeats: int) -> dict:
         "affinity_mask": hex(masks[case]) if case in masks else None,
         "pools": _pools(),
         "answer_ms": round(sum(t["median_ms"] for t in tools.values()), 1),
+        "main_thread": placement(where, cpu_sets()),
+        "main_thread_cpus": where,
         "tools": tools,
     }
 
@@ -374,7 +409,9 @@ def main(argv=None):
                 print(f"{case:9s} {backend:6s} skipped: {row['skipped']}", flush=True)
                 continue
             per = "  ".join(f"{n.split('_')[-1]} {row['tools'][n]['median_ms']:.0f}" for n in TOOL_ORDER)
-            print(f"{case:9s} {backend:6s} answer {row['answer_ms']:8.0f} ms  ({per})", flush=True)
+            share = row["main_thread"]["pcore_share"]
+            on_p = "" if share is None else f"  main thread on P-cores {share:.0%}"
+            print(f"{case:9s} {backend:6s} answer {row['answer_ms']:8.0f} ms  ({per}){on_p}", flush=True)
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(payload, indent=2, default=str), encoding="utf-8")
